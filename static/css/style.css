@@ -51,3 +51,48 @@ button:hover { background-color: #0056b3; }
     border-radius: 8px;
     border-left: 5px solid #007bff;
 }
+* 드롭다운 메뉴 컨테이너 */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+/* 메뉴 제목 (버튼 스타일) */
+.dropbtn {
+    background-color: transparent;
+    color: #555;
+    padding: 10px 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+/* 드롭다운 내용물 (평소엔 숨김) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+/* 드롭다운 안의 링크들 스타일 */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95rem;
+    margin-right: 0; /* 상위 nav a 마진 초기화 */
+}
+
+/* 링크에 마우스 올렸을 때 색 변화 */
+.dropdown-content a:hover {background-color: #f1f1f1;}
+
+/* 메뉴에 마우스 올리면 내용물 보이기 */
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn {color: #007bff;}
