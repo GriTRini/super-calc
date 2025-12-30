@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}부동산 중개수수료 계산기{% endblock %}
+
+{% block content %}
+    <h2>🏠 부동산 중개보수 계산기 (주택)</h2>
+    <p>매매 혹은 전월세 보증금을 입력해주세요.</p>
+
+    <form action="/real-estate/calc" method="post" style="margin-top: 20px;">
+        <div style="margin-bottom: 15px;">
+            <label style="margin-right: 15px;">
+                <input type="radio" name="transaction_type" value="sale" checked> 매매/교환
+            </label>
+            <label>
+                <input type="radio" name="transaction_type" value="lease"> 전세/월세
+            </label>
+        </div>
+
+        <label>
+            거래 금액: 
+            <input type="number" name="price" placeholder="예: 500000000" required> 원
+        </label>
+        <br><br>
+        <button type="submit">복비 계산하기</button>
+    </form>
+
+    {% if result %}
+        <div class="result-box">
+            <h3>📊 계산 결과 ({{ transaction_type }})</h3>
+            <p>거래 금액: <strong>{{ "{:,}".format(price) }}원</strong></p>
+            <p>적용 요율: <strong>{{ rate }}%</strong> (상한요율)</p>
+            <hr>
+            <p>중개 보수: {{ "{:,}".format(fee) }}원</p>
+            <p>부가세(10%): {{ "{:,}".format(vat) }}원</p>
+            <p style="font-size: 1.2rem; color: blue;">
+                <strong>총 예상 금액: {{ "{:,}".format(total) }}원</strong>
+            </p>
+            <p style="font-size: 0.8rem; color: #888;">* 시/도 조례 및 협의에 따라 달라질 수 있습니다.</p>
+        </div>
+    {% endif %}
+{% endblock %}
