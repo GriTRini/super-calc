@@ -3,39 +3,98 @@
 {% block title %}부동산 중개수수료 계산기{% endblock %}
 
 {% block content %}
-    <h2>🏠 부동산 중개보수 계산기 (주택)</h2>
-    <p>매매 혹은 전월세 보증금을 입력해주세요.</p>
+    <h2>🏠 부동산 중개보수 계산기</h2>
+    <p>매물 종류와 거래 금액(만원 단위)을 입력해주세요.</p>
 
-    <form action="/real-estate/calc" method="post" style="margin-top: 20px;">
-        <div style="margin-bottom: 15px;">
-            <label style="margin-right: 15px;">
-                <input type="radio" name="transaction_type" value="sale" checked> 매매/교환
-            </label>
-            <label>
-                <input type="radio" name="transaction_type" value="lease"> 전세/월세
-            </label>
-        </div>
+    <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <form action="/real-estate/calc" method="post">
+            
+            <span class="form-label">거래 종류</span>
+            <div class="tab-container">
+                <input type="radio" id="type_sale" name="transaction_type" value="sale" class="tab-radio" checked>
+                <label for="type_sale" class="tab-label">매매계약</label>
 
-        <label>
-            거래 금액: 
-            <input type="number" name="price" placeholder="예: 500000000" required> 원
-        </label>
-        <br><br>
-        <button type="submit">복비 계산하기</button>
-    </form>
+                <input type="radio" id="type_jeonse" name="transaction_type" value="jeonse" class="tab-radio">
+                <label for="type_jeonse" class="tab-label">전세계약</label>
+
+                <input type="radio" id="type_monthly" name="transaction_type" value="monthly" class="tab-radio">
+                <label for="type_monthly" class="tab-label">월세계약</label>
+            </div>
+
+            <span class="form-label">매물 종류</span>
+            <div class="tab-container">
+                <input type="radio" id="build_house" name="building_type" value="house" class="tab-radio" checked>
+                <label for="build_house" class="tab-label">주택</label>
+
+                <input type="radio" id="build_offi" name="building_type" value="officetel" class="tab-radio">
+                <label for="build_offi" class="tab-label">오피스텔</label>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <span class="form-label">거래 금액 (보증금)</span>
+                <div class="input-group">
+                    <input type="number" id="price_input" name="price_unit" placeholder="예: 50000 (5억원인 경우)" required onkeyup="convertMoney(this, 'price-preview', 10000)">
+                    <span class="input-unit">만원</span>
+                </div>
+                <div id="price-preview" class="korean-preview">0원</div>
+            </div>
+
+            <button type="submit" style="width: 100%; margin-top: 10px;">중개보수 계산하기</button>
+        </form>
+    </div>
 
     {% if result %}
         <div class="result-box">
-            <h3>📊 계산 결과 ({{ transaction_type }})</h3>
+            <h3>📊 계산 결과</h3>
+            <p>거래 종류: <strong>{{ trans_kor }}</strong> / 건물: <strong>{{ build_kor }}</strong></p>
             <p>거래 금액: <strong>{{ "{:,}".format(price) }}원</strong></p>
-            <p>적용 요율: <strong>{{ rate }}%</strong> (상한요율)</p>
+            <p>적용 요율: <strong>{{ rate }}%</strong> 
+                {% if max_fee > 0 %}(한도액: {{ "{:,}".format(max_fee) }}원){% endif %}
+            </p>
             <hr>
             <p>중개 보수: {{ "{:,}".format(fee) }}원</p>
             <p>부가세(10%): {{ "{:,}".format(vat) }}원</p>
             <p style="font-size: 1.2rem; color: blue;">
                 <strong>총 예상 금액: {{ "{:,}".format(total) }}원</strong>
             </p>
-            <p style="font-size: 0.8rem; color: #888;">* 시/도 조례 및 협의에 따라 달라질 수 있습니다.</p>
         </div>
     {% endif %}
+
+    <script>
+        function convertMoney(input, targetId, unitMultiplier) {
+            const val = input.value;
+            const target = document.getElementById(targetId);
+            
+            if (!val || val == 0) {
+                target.innerText = "0원";
+                return;
+            }
+
+            // 만원 단위 입력이면 * 10000 해서 실제 원단위로 변환
+            const numberVal = parseInt(val) * unitMultiplier;
+            
+            // 한글 변환 로직
+            const unitWords = ['', '만', '억', '조', '경'];
+            let result = '';
+            let num = numberVal;
+            let count = 0;
+
+            while (num > 0) {
+                let mod = num % 10000;
+                if (mod > 0) {
+                    // 1234 -> 1천 2백 3십 4 (여기선 간단히 숫자+단위로 표현: 1234만)
+                    result = formatNumber(mod) + unitWords[count] + ' ' + result;
+                }
+                num = Math.floor(num / 10000);
+                count++;
+            }
+
+            target.innerText = result + "원";
+        }
+
+        // 3자리 콤마 찍기 함수
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
 {% endblock %}

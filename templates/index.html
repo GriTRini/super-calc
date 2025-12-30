@@ -1,10 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div style="text-align: center; padding: 50px 0;">
-        <h2>생활에 필요한 모든 계산을 한곳에서!</h2>
-        <p>복잡한 계산, 이제 1초 만에 해결하세요.</p>
-        <br>
-        <a href="/salary"><button>급여 계산하러 가기 &rarr;</button></a>
+    <div style="text-align: center; padding: 40px 0 20px 0;">
+        <h2 style="font-size: 2rem; margin-bottom: 10px;">생활에 필요한 모든 계산을 한곳에서!</h2>
+        <p style="color: #666; font-size: 1.1rem;">복잡한 계산, 이제 1초 만에 해결하세요.</p>
+    </div>
+
+    <div class="menu-grid">
+        
+        <a href="/salary" class="menu-card">
+            <div class="menu-icon">💰</div>
+            <div class="menu-title">통합 급여 계산기</div>
+            <div class="menu-desc">연봉 실수령액, 알바 시급,<br>프리랜서 3.3% 자동 계산</div>
+        </a>
+
+        <a href="/real-estate" class="menu-card">
+            <div class="menu-icon">🏠</div>
+            <div class="menu-title">부동산 중개보수</div>
+            <div class="menu-desc">매매, 전세, 월세 계약 시<br>법정 중개수수료 계산</div>
+        </a>
+
+        <a href="/severance" class="menu-card">
+            <div class="menu-icon">💼</div>
+            <div class="menu-title">퇴직금 계산기</div>
+            <div class="menu-desc">입사일과 퇴사일로<br>예상 퇴직금 자동 계산</div>
+        </a>
+
+        <div class="menu-card" style="opacity: 0.6; cursor: default;">
+            <div class="menu-icon">🚧</div>
+            <div class="menu-title">준비 중...</div>
+            <div class="menu-desc">더 많은 편의 기능이<br>곧 추가될 예정입니다.</div>
+        </div>
+
+        <div class="menu-card" style="opacity: 0.6; cursor: default;">
+            <div class="menu-icon">🔜</div>
+            <div class="menu-title">업데이트 예정</div>
+            <div class="menu-desc">필요한 계산기가 있다면<br>의견을 주세요!</div>
+        </div>
+
     </div>
 {% endblock %}

@@ -1,28 +1,261 @@
 {% extends "base.html" %}
 
-{% block title %}프리랜서 급여 계산기{% endblock %}
+{% block title %}2025 전문 급여 계산기{% endblock %}
 
 {% block content %}
-    <h2>💰 프리랜서/알바 실수령액 계산기 (3.3%)</h2>
-    <p>세전 금액을 입력하면 3.3% 세금을 공제한 실수령액을 알려드립니다.</p>
+    <h2>💰 전문 급여 계산기</h2>
+    <p>직장인 연봉부터 알바비(주휴수당 포함)까지 한 번에 계산하세요.</p>
     
-    <form action="/salary/calc" method="post" style="margin-top: 20px;">
-        <label>
-            세전 급여: 
-            <input type="number" name="income" placeholder="예: 1000000" required> 원
-        </label>
-        <button type="submit">계산하기</button>
-    </form>
+    <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        
+        <form action="/salary/calc" method="post">
+            
+            <div style="margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+                <label style="margin-right: 20px; font-weight: bold; cursor: pointer;">
+                    <input type="radio" name="calc_type" value="salary" checked onclick="toggleOptions('salary')"> 🏢 직장인
+                </label>
+                <label style="margin-right: 20px; font-weight: bold; cursor: pointer;">
+                    <input type="radio" name="calc_type" value="hourly" onclick="toggleOptions('hourly')"> ⏱️ 알바(시급)
+                </label>
+                <label style="font-weight: bold; cursor: pointer;">
+                    <input type="radio" name="calc_type" value="freelancer" onclick="toggleOptions('freelancer')"> 💼 프리랜서
+                </label>
+            </div>
+
+            <div id="salary-input-group">
+                <div id="salary-options" class="input-grid">
+                    <div>
+                        <span class="form-label">급여 기준</span>
+                        <div class="toggle-group">
+                            <input type="radio" id="st_year" name="salary_type" value="year" checked>
+                            <label for="st_year">연봉</label>
+                            <input type="radio" id="st_month" name="salary_type" value="month">
+                            <label for="st_month">월급</label>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="form-label">퇴직금</span>
+                        <div class="toggle-group">
+                            <input type="radio" id="sev_sep" name="severance_type" value="separate" checked>
+                            <label for="sev_sep">별도</label>
+                            <input type="radio" id="sev_inc" name="severance_type" value="included">
+                            <label for="sev_inc">포함</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 5px;">
+                    <span class="form-label">금액 입력 (원)</span>
+                    <input type="number" name="amount" placeholder="금액을 입력하세요" 
+                           style="width: 100%; padding: 12px; font-size: 1.1rem; border: 1px solid #ddd; border-radius: 5px;"
+                           onkeyup="convertMoney(this, 'salary-preview', 1)">
+                </div>
+                <div id="salary-preview" class="korean-preview">0원</div>
+            </div>
+
+            <div id="hourly-options" style="display: none;">
+                
+                <div style="margin-bottom: 20px;">
+                    <span class="form-label">시급 (2025 최저: 10,030원)</span>
+                    <input type="number" name="hourly_wage" placeholder="10030" 
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;"
+                           onkeyup="convertMoney(this, 'hourly-preview', 1)">
+                    <div id="hourly-preview" class="korean-preview">0원</div>
+                </div>
+
+                <div class="input-grid">
+                    <div>
+                        <span class="form-label">일일 근무시간</span>
+                        <select name="daily_hours" class="wide-select">
+                            {% for i in range(1, 13) %}
+                            <option value="{{ i }}" {% if i==8 %}selected{% endif %}>{{ i }}시간</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <span class="form-label">일주 근무일수</span>
+                        <select name="weekly_days" class="wide-select">
+                            {% for i in range(1, 8) %}
+                            <option value="{{ i }}" {% if i==5 %}selected{% endif %}>{{ i }}일</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span class="form-label">월 연장 근무 시간 (선택)</span>
+                    <select name="overtime_hours" class="wide-select">
+                        <option value="0">없음</option>
+                        {% for i in range(1, 51) %}
+                        <option value="{{ i }}">{{ i }}시간</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span class="form-label">주휴수당 ❓</span>
+                    <div class="toggle-radio-group">
+                        <input type="radio" id="juhyu_no" name="juhyu_state" value="excluded" checked>
+                        <label for="juhyu_no">미포함</label>
+                        
+                        <input type="radio" id="juhyu_yes" name="juhyu_state" value="included">
+                        <label for="juhyu_yes">포함</label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span class="form-label">세금</span>
+                    <select name="tax_type" class="wide-select">
+                        <option value="none">미적용 (0%)</option>
+                        <option value="3.3">3.3% 공제</option>
+                        <option value="4major">4대보험 적용</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span class="form-label">수습기간 (3개월 이내 90%) ❓</span>
+                    <div class="toggle-radio-group">
+                        <input type="radio" id="prob_no" name="probation" value="no" checked>
+                        <label for="prob_no">미적용</label>
+                        
+                        <input type="radio" id="prob_yes" name="probation" value="yes">
+                        <label for="prob_yes">적용</label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="advanced-options">
+                <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ddd;">
+                <div class="input-grid">
+                    <div>
+                        <span class="form-label">부양 가족 수</span>
+                        <div class="counter-box">
+                            <button type="button" class="counter-btn" onclick="changeVal('dependents', -1)">-</button>
+                            <input type="number" id="dependents" name="dependents" class="counter-input" value="1" readonly>
+                            <button type="button" class="counter-btn" onclick="changeVal('dependents', 1)">+</button>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="form-label">20세 이하 자녀수</span>
+                        <div class="counter-box">
+                            <button type="button" class="counter-btn" onclick="changeVal('children', -1)">-</button>
+                            <input type="number" id="children" name="children" class="counter-input" value="0" readonly>
+                            <button type="button" class="counter-btn" onclick="changeVal('children', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <span class="form-label">비과세액 (식대 등)</span>
+                    <input type="number" name="non_taxable" value="200000" style="width: 100%; padding: 10px;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-yellow">계산하기</button>
+        </form>
+    </div>
 
     {% if result is not none %}
-        <div class="result-box">
-            <h3>📊 계산 결과</h3>
-            <p>입력하신 금액: <strong>{{ "{:,}".format(original) }}원</strong></p>
-            <p>공제 세금 (3.3%): <span style="color: red;">- {{ "{:,}".format(tax) }}원</span></p>
-            <hr>
-            <p style="font-size: 1.2rem;">
-                실제 받으실 금액: <strong style="color: blue;">{{ "{:,}".format(result) }}원</strong>
-            </p>
+        <div class="result-box" style="margin-top: 30px; background: #fff; border: 2px solid #555; border-radius: 15px; overflow: hidden;">
+            <div style="background-color: #555; color: white; padding: 25px; text-align: center;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">월 예상 실수령액</p>
+                <h2 style="margin: 5px 0 0 0; font-size: 2.2rem; color: #fff;">{{ "{:,}".format(result) }}원</h2>
+            </div>
+            
+            <div style="padding: 25px;">
+                {% if calc_type == 'hourly' %}
+                    <h4 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">근무 상세</h4>
+                    <div style="font-size: 0.95rem; color: #555; margin-bottom: 20px;">
+                        <p>기본급: {{ "{:,}".format(monthly_salary - overtime_pay - holiday_pay) }}원 (시급 {{ "{:,}".format(base_hourly_rate) }}원)</p>
+                        <p>주휴수당: +{{ "{:,}".format(holiday_pay) }}원</p>
+                        <p>연장수당: +{{ "{:,}".format(overtime_pay) }}원</p>
+                        <p style="font-weight: bold; color: blue;">세전 월급 합계: {{ "{:,}".format(monthly_salary) }}원</p>
+                    </div>
+                {% endif %}
+
+                <h4 style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">공제 내역</h4>
+                
+                <div style="font-size: 1rem;">
+                    {% if pension > 0 %}<div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>국민연금</span> <span>{{ "{:,}".format(pension) }}원</span></div>{% endif %}
+                    {% if health > 0 %}<div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>건강보험</span> <span>{{ "{:,}".format(health) }}원</span></div>{% endif %}
+                    {% if care > 0 %}<div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>장기요양</span> <span>{{ "{:,}".format(care) }}원</span></div>{% endif %}
+                    {% if employ > 0 %}<div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>고용보험</span> <span>{{ "{:,}".format(employ) }}원</span></div>{% endif %}
+                    
+                    {% if income_tax > 0 or local_tax > 0 %}
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>소득세</span> <span>{{ "{:,}".format(income_tax) }}원</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>지방소득세</span> <span>{{ "{:,}".format(local_tax) }}원</span></div>
+                    {% endif %}
+                    
+                    {% if total_tax == 0 %}
+                    <div style="text-align: center; color: #999; margin: 20px 0;">공제된 세금이 없습니다.</div>
+                    {% endif %}
+                </div>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 2px dashed #eee;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem;">
+                    <span style="color: #333;">공제액 합계</span>
+                    <span style="color: #ff4d4d;">- {{ "{:,}".format(total_tax) }}원</span>
+                </div>
+            </div>
         </div>
     {% endif %}
+
+    <script>
+        function toggleOptions(type) {
+            const salaryInputGroup = document.getElementById('salary-input-group'); // 직장인 금액입력창
+            const hourlyOptions = document.getElementById('hourly-options');       // 알바 상세옵션
+            const salaryOptions = document.getElementById('salary-options');       // 연봉/월급 선택
+            const advOptions = document.getElementById('advanced-options');        // 고급설정 (부양가족 등)
+
+            if (type === 'hourly') {
+                // 알바 선택 시
+                salaryInputGroup.style.display = 'none'; // 기본 금액 입력창 숨김
+                hourlyOptions.style.display = 'block';   // 알바 상세폼 보임
+                advOptions.style.display = 'none';       // [변경] 부양가족/비과세 숨김
+            } else if (type === 'freelancer') {
+                // 프리랜서
+                salaryInputGroup.style.display = 'block';
+                hourlyOptions.style.display = 'none';
+                salaryOptions.style.display = 'none';
+                advOptions.style.display = 'none';       // 프리랜서도 숨김
+            } else {
+                // 직장인 (기본)
+                salaryInputGroup.style.display = 'block';
+                hourlyOptions.style.display = 'none';
+                salaryOptions.style.display = 'grid';
+                advOptions.style.display = 'block';      // 직장인만 고급설정 보임
+            }
+        }
+        
+        function changeVal(id, delta) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) || 0;
+            val += delta;
+            if (val < 0) val = 0;
+            input.value = val;
+        }
+
+        function convertMoney(input, targetId, unitMultiplier) {
+            const val = input.value;
+            const target = document.getElementById(targetId);
+            if (!val || val == 0) { target.innerText = "0원"; return; }
+            const numberVal = parseInt(val) * unitMultiplier;
+            const unitWords = ['', '만', '억', '조'];
+            let result = '';
+            let num = numberVal;
+            let count = 0;
+            while (num > 0) {
+                let mod = num % 10000;
+                if (mod > 0) {
+                    result = formatNumber(mod) + unitWords[count] + ' ' + result;
+                }
+                num = Math.floor(num / 10000);
+                count++;
+            }
+            target.innerText = result + "원";
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
 {% endblock %}

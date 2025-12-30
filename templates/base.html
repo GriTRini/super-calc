@@ -7,24 +7,17 @@
     <link rel="stylesheet" href="/static/css/style.css">
     
     <style>
-        /* 광고 영역 공통 스타일 */
         .ad-container {
             text-align: center;
             margin: 20px 0;
             padding: 10px;
-            background-color: #f9f9f9; /* 광고 영역 구분용 연한 회색 */
+            background-color: #f9f9f9;
         }
-
-        /* 1. PC용 광고 (728x90 권장) */
         .ad-pc { display: block; }
-        
-        /* 2. 모바일용 광고 (300x250 또는 320x100) */
         .ad-mobile { display: none; }
-
-        /* 화면 폭이 768px 이하(스마트폰)일 때 작동 */
         @media (max-width: 768px) {
-            .ad-pc { display: none; }       /* PC 광고 숨김 */
-            .ad-mobile { display: block; }  /* 모바일 광고 보임 */
+            .ad-pc { display: none; }
+            .ad-mobile { display: block; }
         }
     </style>
 </head>
@@ -32,35 +25,16 @@
     <div class="container">
         <header>
             <h1>🧮 모두의 만능 계산기</h1>
+            
             <nav>
-                <a href="/" style="margin-right: 20px;">🏠 홈</a>
-
-                <div class="dropdown">
-                    <button class="dropbtn">💰 급여 계산기 ▼</button>
-                    <div class="dropdown-content">
-                        <a href="/salary">프리랜서 (3.3%)</a>
-                        <a href="#" onclick="alert('준비 중입니다!')">4대보험 계산기</a>
-                        <a href="#" onclick="alert('준비 중입니다!')">퇴직금 계산기</a>
-                    </div>
-                </div>
-
-                <div class="dropdown">
-                    <button class="dropbtn">🏠 부동산 계산기 ▼</button>
-                    <div class="dropdown-content">
-                        <a href="/real-estate">중개수수료 (복비)</a>
-                        <a href="#" onclick="alert('준비 중입니다!')">평수 ↔ m² 변환</a>
-                        <a href="#" onclick="alert('준비 중입니다!')">취득세 계산기</a>
-                    </div>
-                </div>
+                <a href="/">🏠 홈</a>
             </nav>
-        </header>
+            </header>
 
         <div class="ad-container">
-            
             <div class="ad-pc">
                 <p style="color: #999; font-size: 0.8rem;">PC 광고 영역 (728x90)</p>
-                </div>
-
+            </div>
             <div class="ad-mobile">
                 <ins class="kakao_ad_area" style="display:none;"
                  data-ad-unit    = "DAN-L0oTg9DqyK7ZvQZs"
@@ -68,8 +42,8 @@
                  data-ad-height  = "250"></ins>
                 <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
             </div>
-
         </div>
+
         <main>
             {% block content %}{% endblock %}
         </main>
