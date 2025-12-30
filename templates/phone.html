@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}휴대폰 구매 비교 (자급제 vs 통신사){% endblock %}
+
+{% block content %}
+    <h2>📱 자급제 vs 통신사 최저가 비교</h2>
+    <p>원하는 기종을 선택하고, 알뜰폰과 통신사 조건을 입력해보세요.</p>
+    
+    <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        
+        <form action="/phone/calc" method="post">
+            
+            <div style="margin-bottom: 30px; text-align: center;">
+                <span class="form-label" style="font-size: 1.2rem;">구매할 기종 선택</span>
+                <select name="phone_code" class="wide-select" style="font-size: 1.1rem; padding: 10px; margin-top: 10px;" onchange="updatePrices(this)">
+                    {% for code, info in phones.items() %}
+                    <option value="{{ code }}" 
+                            data-market="{{ info.market_price }}" 
+                            data-store="{{ info.store_price }}"
+                            {% if selected_code == code %}selected{% endif %}>
+                        {{ info.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <hr style="border: 0; border-top: 2px dashed #ddd; margin-bottom: 30px;">
+
+            <div class="input-grid" style="align-items: start;">
+                
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
+                    <h3 style="text-align: center; color: #333; margin-bottom: 20px;">🪙 자급제 + 알뜰폰</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label">기기값 (인터넷 최저가)</span>
+                        <input type="text" id="disp_market_price" class="readonly-input" value="0원" readonly>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label">알뜰폰 요금제 (월)</span>
+                        <input type="number" name="mvno_cost" placeholder="33000" value="{{ input_mvno|default(33000) }}" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                    </div>
+                    
+                    <p style="font-size: 0.85rem; color: #666;">
+                        * 자급제는 카드 무이자 할부 / 약정 없음 기준입니다.
+                    </p>
+                </div>
+
+                <div style="background-color: #e3f2fd; padding: 20px; border-radius: 10px; border: 1px solid #90caf9;">
+                    <h3 style="text-align: center; color: #0d47a1; margin-bottom: 20px;">🏢 통신사 약정 개통</h3>
+
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label">출고가 (정가)</span>
+                        <input type="text" id="disp_store_price" class="readonly-input" value="0원" readonly>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label">5G 요금제 (월)</span>
+                        <input type="number" name="plan_cost" id="plan_cost" placeholder="90000" value="{{ input_plan|default(90000) }}"
+                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                    </div>
+
+                    <div style="margin-bottom: 15px; background: white; padding: 10px; border-radius: 5px;">
+                        <span class="form-label" style="margin-bottom: 5px; display:block;">할인 방식 선택</span>
+                        <div style="display: flex; gap: 15px;">
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="carrier_type" value="gongsi" onclick="toggleCarrierType('gongsi')" 
+                                {% if carrier_type == 'gongsi' or carrier_type is not defined %}checked{% endif %}> 공시지원금
+                            </label>
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="carrier_type" value="seonyak" onclick="toggleCarrierType('seonyak')"
+                                {% if carrier_type == 'seonyak' %}checked{% endif %}> 선택약정 (25%)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="gongsi_input_box" style="margin-bottom: 15px;">
+                        <span class="form-label">공시지원금 (기기 할인액)</span>
+                        <input type="number" name="subsidy" placeholder="500000" value="{{ input_subsidy|default(500000) }}"
+                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label">추가 월 할인 (가족결합/복지 등)</span>
+                        <input type="number" name="add_discount" placeholder="0" value="{{ input_add_discount|default(0) }}"
+                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <div style="font-size: 0.8rem; color: #666; margin-top: 3px;">* 월 할인 금액을 입력하세요.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <button type="submit" class="btn-yellow" style="margin-top: 30px; background-color: #2c3e50; color: white;">💰 2년 총 비용 비교하기</button>
+        </form>
+    </div>
+
+    {% if result %}
+        <div class="result-box" style="margin-top: 30px; border: 3px solid {% if winner == 'self' %}#333{% else %}#0d47a1{% endif %}; border-radius: 15px; overflow: hidden; background: white;">
+            
+            <div style="background-color: {% if winner == 'self' %}#333{% else %}#0d47a1{% endif %}; color: white; padding: 20px; text-align: center;">
+                <p style="margin: 0; font-size: 1rem; opacity: 0.9;">더 저렴한 방식은?</p>
+                <h2 style="margin: 5px 0 0 0; font-size: 2rem;">🏆 {{ recommend_text }}</h2>
+                <p style="margin-top: 5px; font-weight: bold;">(2년간 약 {{ "{:,}".format(diff_price) }}원 절약)</p>
+            </div>
+            
+            <div style="display: flex; flex-wrap: wrap; padding: 20px;">
+                <div style="flex: 1; min-width: 250px; padding: 15px; border-right: 1px dashed #ddd;">
+                    <h3 style="text-align: center;">자급제 + 알뜰폰</h3>
+                    <ul style="list-style: none; padding: 0; line-height: 1.8; font-size: 0.95rem;">
+                        <li>• 기기값: {{ "{:,}".format(market_price) }}원</li>
+                        <li>• 24개월 요금: {{ "{:,}".format(input_mvno * 24) }}원</li>
+                        <li>• 할부수수료: 0원</li>
+                    </ul>
+                    <hr>
+                    <h2 style="text-align: center; color: #333;">{{ "{:,}".format(self_total) }}원</h2>
+                </div>
+
+                <div style="flex: 1; min-width: 250px; padding: 15px;">
+                    <h3 style="text-align: center; color: #0d47a1;">통신사 ({{ carrier_method_text }})</h3>
+                    <ul style="list-style: none; padding: 0; line-height: 1.8; font-size: 0.95rem;">
+                        <li>• 기기값(할부원금): {{ "{:,}".format(carrier_principal) }}원</li>
+                        <li>• 할부수수료(5.9%): +{{ "{:,}".format(carrier_interest) }}원</li>
+                        <li>• 24개월 요금: {{ "{:,}".format(input_plan * 24) }}원</li>
+                        {% if discount_total > 0 %}
+                        <li style="color: red;">• 총 요금 할인: -{{ "{:,}".format(discount_total) }}원</li>
+                        {% endif %}
+                    </ul>
+                    <hr>
+                    <h2 style="text-align: center; color: #0d47a1;">{{ "{:,}".format(carrier_total) }}원</h2>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <style>
+        .readonly-input {
+            width: 100%;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        // 1. 기종 선택 시 가격 자동 표시
+        function updatePrices(select) {
+            const option = select.options[select.selectedIndex];
+            const market = parseInt(option.getAttribute('data-market'));
+            const store = parseInt(option.getAttribute('data-store'));
+            
+            document.getElementById('disp_market_price').value = market.toLocaleString() + "원";
+            document.getElementById('disp_store_price').value = store.toLocaleString() + "원";
+        }
+
+        // 2. 공시 vs 선약 선택 시 입력창 제어
+        function toggleCarrierType(type) {
+            const gongsiBox = document.getElementById('gongsi_input_box');
+            if (type === 'seonyak') {
+                gongsiBox.style.display = 'none'; // 공시지원금 입력 숨김
+            } else {
+                gongsiBox.style.display = 'block'; // 공시지원금 입력 보임
+            }
+        }
+
+        // 페이지 로드 시 초기 실행
+        window.onload = function() {
+            // 가격 표시
+            const select = document.querySelector('select[name="phone_code"]');
+            if(select) updatePrices(select);
+            
+            // 라디오 버튼 상태에 따라 UI 설정
+            const checkedRadio = document.querySelector('input[name="carrier_type"]:checked');
+            if(checkedRadio) toggleCarrierType(checkedRadio.value);
+        }
+    </script>
+{% endblock %}

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from routers import salary, real_estate, severance
+from routers import salary, real_estate, severance, phone
 
 app = FastAPI()
 
@@ -12,6 +12,7 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(salary.router)
 app.include_router(real_estate.router)
 app.include_router(severance.router)
+app.include_router(phone.router)
 
 # 1. 메인 홈
 @app.get("/")
