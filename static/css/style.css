@@ -30,6 +30,7 @@ nav {
     padding-bottom: 15px;
     margin-bottom: 30px;
     display: flex;
+    justify-content: center; /* 메뉴 가운데 정렬 */
     align-items: center;
 }
 
@@ -37,8 +38,9 @@ nav a {
     text-decoration: none;
     color: #555;
     font-weight: bold;
-    margin-right: 20px;
     font-size: 1.1rem;
+    padding: 10px;
+    transition: color 0.2s;
 }
 nav a:hover { color: #007bff; }
 
@@ -52,6 +54,7 @@ input[type="number"], input[type="text"] {
     font-size: 1rem;
     outline: none;
     transition: border-color 0.2s;
+    box-sizing: border-box; /* 패딩 포함 너비 계산 */
 }
 input:focus { border-color: #007bff; }
 
@@ -67,8 +70,16 @@ button {
 }
 button:hover { background-color: #0056b3; }
 
+/* 읽기 전용 인풋 (결과값 표시용) */
+.readonly-input {
+    background-color: #eee;
+    color: #555;
+    font-weight: bold;
+    cursor: default;
+}
+
 /* --------------------------------------------------------- */
-/* 4. 메인 화면 아이콘 그리드 (Home Menu Grid) */
+/* 4. 그리드 및 레이아웃 유틸 (Grid & Utils) */
 /* --------------------------------------------------------- */
 .menu-grid {
     display: grid;
@@ -97,27 +108,6 @@ button:hover { background-color: #0056b3; }
 .menu-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #222; }
 .menu-desc { font-size: 0.9rem; color: #888; line-height: 1.4; }
 
-/* --------------------------------------------------------- */
-/* 5. 광고 반응형 처리 (Ads Responsive) */
-/* --------------------------------------------------------- */
-.ad-container {
-    text-align: center;
-    margin: 20px 0;
-    padding: 10px;
-    background-color: #f9f9f9;
-}
-.ad-pc { display: block; }
-.ad-mobile { display: none; }
-
-@media (max-width: 768px) {
-    .ad-pc { display: none; }
-    .ad-mobile { display: block; }
-}
-
-/* --------------------------------------------------------- */
-/* 6. 고급 계산기 전용 스타일 (Advanced Calculator UI) */
-/* --------------------------------------------------------- */
-
 /* 입력 라벨 */
 .form-label {
     font-weight: bold;
@@ -127,163 +117,15 @@ button:hover { background-color: #0056b3; }
     font-size: 0.95rem;
 }
 
-/* 2열 그리드 배치 (좌우 나란히) */
+/* 2열 그리드 배치 (좌우 나란히, 모바일엔 위아래) */
 .input-grid {
     display: grid;
-    /* 최소 200px 너비 확보, 공간이 부족하면 자동으로 줄바꿈 */
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 20px;
     margin-bottom: 20px;
 }
 
-/* 버튼형 라디오 그룹 (토글 스위치) */
-.toggle-group {
-    display: flex;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-}
-.toggle-group input[type="radio"] {
-    display: none; /* 라디오 버튼 숨김 */
-}
-.toggle-group label {
-    flex: 1; /* 너비 균등 분배 */
-    padding: 10px;
-    text-align: center;
-    background-color: #fff;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #555;
-    border-right: 1px solid #ddd;
-    transition: all 0.2s;
-}
-.toggle-group label:last-child {
-    border-right: none;
-}
-/* 선택된 상태 디자인 */
-.toggle-group input[type="radio"]:checked + label {
-    background-color: #555; /* 짙은 회색 */
-    color: white;
-    font-weight: bold;
-}
-
-/* 수량 조절 박스 (+/- 버튼) */
-.counter-box {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #fff;
-    width: 100%; /* 부모 너비에 맞춤 */
-    max-width: 150px;
-}
-.counter-btn {
-    width: 40px;
-    height: 40px;
-    background-color: #f8f9fa;
-    border: none;
-    border-radius: 0; /* 둥근 모서리 제거 */
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #555;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-}
-.counter-btn:hover { background-color: #e2e6ea; }
-.counter-input {
-    flex: 1;
-    width: 40px;
-    text-align: center;
-    border: none;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-radius: 0;
-    font-size: 1rem;
-    height: 38px;
-    padding: 0;
-}
-/* 숫자 입력창 화살표 제거 (크롬, 사파리 등) */
-.counter-input::-webkit-outer-spin-button,
-.counter-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* 결과 박스 기본 스타일 */
-.result-box {
-    margin-top: 30px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-/* ... 기존 코드 아래에 추가 ... */
-
-/* -------------------------------------- */
-/* ▼ 입력 단위(만원) 및 한글 미리보기 스타일 ▼ */
-/* -------------------------------------- */
-
-/* 입력창 + 단위 텍스트 묶음 */
-.input-group {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-    padding-right: 15px; /* 단위 텍스트 여백 */
-    overflow: hidden;
-}
-.input-group input {
-    border: none;
-    box-shadow: none;
-    flex: 1; /* 남은 공간 다 차지 */
-    padding: 12px;
-}
-.input-unit {
-    color: #555;
-    font-weight: bold;
-    font-size: 1rem;
-    white-space: nowrap;
-}
-
-/* 한글 금액 미리보기 텍스트 (예: 5억 3천만원) */
-.korean-preview {
-    font-size: 0.9rem;
-    color: #007bff; /* 파란색으로 강조 */
-    margin-top: 5px;
-    margin-bottom: 15px;
-    font-weight: bold;
-    min-height: 1.2em; /* 텍스트 없어도 자리 차지 */
-}
-
-/* 탭 버튼 스타일 (매매/전세/월세 등) */
-.tab-container {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 15px;
-}
-.tab-radio {
-    display: none;
-}
-.tab-label {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    background-color: #f8f9fa;
-    color: #555;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-}
-.tab-radio:checked + .tab-label {
-    background-color: #007bff; /* 선택 시 파란색 */
-    color: white;
-    border-color: #007bff;
-    font-weight: bold;
-}
-
+/* 드롭다운 (Wide Select) */
 .wide-select {
     width: 100%;
     padding: 12px;
@@ -296,125 +138,79 @@ button:hover { background-color: #0056b3; }
     cursor: pointer;
 }
 
-/* 라디오 버튼을 탭/토글 처럼 보이게 만들기 */
-.toggle-radio-group {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-}
-.toggle-radio-group input[type="radio"] {
-    display: none;
-}
-/* 기본 상태 (선택 안됨) - 흰색 배경에 회색 테두리 */
-.toggle-radio-group label {
-    flex: 1;
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+/* 결과 박스 */
+.result-box {
+    margin-top: 30px;
     background-color: #fff;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: normal;
-}
-/* 선택된 상태 - 파란색 테두리와 파란 글씨 (스크린샷 스타일) */
-.toggle-radio-group input[type="radio"]:checked + label {
-    border-color: #007bff;
-    color: #007bff;
-    background-color: #e7f5ff;
-    font-weight: bold;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* 알바용 노란색 계산 버튼 (스크린샷 포인트) */
+/* 강조 버튼 (노란색/남색 등) */
 .btn-yellow {
     width: 100%;
     padding: 15px;
-    background-color: #ffeb3b; /* 쨍한 노란색 */
-    color: #333;
+    background-color: #2c3e50; /* 다크 네이비로 변경 (신뢰감) */
+    color: #fff;
     font-size: 1.2rem;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     margin-top: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.2s;
 }
 .btn-yellow:hover {
-    background-color: #fdd835; /* 호버 시 약간 진하게 */
+    background-color: #1a252f;
 }
 
-input[type="date"] {
-    font-family: inherit;
-    background-color: #fff;
-    cursor: pointer;
-    color: #333;
-    appearance: none;
-    width: 100%;       /* 가로 꽉 채우기 */
-    box-sizing: border-box; /* 테두리 포함 크기 계산 */
-    padding: 12px;     /* 내부 여백 넉넉하게 */
-}
+/* --------------------------------------------------------- */
+/* 5. 광고 반응형 설정 (Ads Responsive) - 통합됨 */
+/* --------------------------------------------------------- */
 
-.kakao-ad-sidebar {
-    position: fixed;   /* 화면에 고정 */
-    top: 50%;          /* 높이 중간 */
-    transform: translateY(-50%);
-    
-    /* [변경] 본문 위치 상관없이 무조건 화면 오른쪽에 붙임 */
-    right: 20px;       
-    
-    width: 160px;
-    height: 600px;
-    z-index: 1000;
-}
-
-/* 화면이 좁아지면(노트북/태블릿/모바일) 광고 숨기기 */
-/* 광고가 본문을 가리는 것을 방지 */
-@media (max-width: 900px) {
-    .kakao-ad-sidebar {
-        display: none; /* 태블릿/모바일에서만 숨김 */
-    }
-}
-
-* ---------------------------------------------------- */
-/* ▼ [광고 반응형 설정] 화면 크기에 따라 골라 보여주기 ▼ */
-/* ---------------------------------------------------- */
-
-/* 상단 광고 컨테이너 (여백 정리) */
+/* [5-1] 상단 광고 컨테이너 */
 .ad-top-container {
     text-align: center;
     margin: 20px 0;
     padding: 10px;
     background-color: #f9f9f9;
     border-radius: 10px;
+    overflow: hidden; /* 내용 넘침 방지 */
 }
 
-/* 1. PC 가로형 (728x90) 기본 설정 */
+/* PC 가로형 (728x90) */
 .ad-pc-horizontal {
-    display: block; /* 기본적으로 보임 */
+    display: block;
+    margin: 0 auto;
 }
 
-/* 2. 모바일 띠배너 (320x50) 기본 설정 */
+/* 모바일 띠배너 (320x50) */
 .ad-mobile-banner {
-    display: none;  /* 기본적으로 숨김 (PC니까) */
+    display: none; /* 기본 숨김 */
+    width: 100%;
+    justify-content: center;
+    align-items: center;
 }
 
-/* 3. PC 세로형 사이드바 (160x600) 기본 설정 */
+/* [5-2] 우측 사이드바 광고 (PC 세로형 160x600) */
 .ad-pc-sidebar {
-    position: fixed;
-    top: 50%;
+    position: fixed;   /* 화면 고정 */
+    top: 50%;          /* 수직 중앙 */
     transform: translateY(-50%);
-    right: 20px; /* 화면 오른쪽에 고정 */
+    right: 20px;       /* 오른쪽 여백 */
+    
+    width: 160px;
+    height: 600px;
     z-index: 1000;
-    display: block; /* 기본적으로 보임 */
+    display: block;    /* 기본 보임 */
 }
 
-
 /* ---------------------------------------------------- */
-/* ▼ [모바일/태블릿 화면일 때 동작] (미디어 쿼리) ▼ */
+/* ▼ [미디어 쿼리] 화면 크기별 광고 제어 ▼ */
 /* ---------------------------------------------------- */
 
-/* 화면이 1200px보다 작을 때 (작은 노트북, 태블릿) */
+/* 화면이 1200px보다 작을 때 (노트북, 태블릿) */
 /* -> 사이드바 광고가 본문을 가리므로 숨깁니다. */
 @media (max-width: 1200px) {
     .ad-pc-sidebar {
@@ -428,7 +224,9 @@ input[type="date"] {
     .ad-pc-horizontal {
         display: none !important;
     }
+    
     .ad-mobile-banner {
-        display: block !important;
+        display: flex !important;
+        margin-top: 5px;
     }
 }
