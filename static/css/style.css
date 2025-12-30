@@ -357,12 +357,11 @@ input[type="date"] {
 
 .kakao-ad-sidebar {
     position: fixed;   /* 화면에 고정 */
-    top: 50%;          /* 화면 높이의 중간 */
-    transform: translateY(-50%); /* 정확한 중간 정렬 */
+    top: 50%;          /* 높이 중간 */
+    transform: translateY(-50%);
     
-    /* 본문 컨테이너(800px) 기준으로 오른쪽에 배치 */
-    left: 50%;
-    margin-left: 420px; /* 800px의 절반(400) + 여백(20) */
+    /* [변경] 본문 위치 상관없이 무조건 화면 오른쪽에 붙임 */
+    right: 20px;       
     
     width: 160px;
     height: 600px;
@@ -371,8 +370,65 @@ input[type="date"] {
 
 /* 화면이 좁아지면(노트북/태블릿/모바일) 광고 숨기기 */
 /* 광고가 본문을 가리는 것을 방지 */
-@media (max-width: 1200px) {
+@media (max-width: 900px) {
     .kakao-ad-sidebar {
-        display: none;
+        display: none; /* 태블릿/모바일에서만 숨김 */
+    }
+}
+
+* ---------------------------------------------------- */
+/* ▼ [광고 반응형 설정] 화면 크기에 따라 골라 보여주기 ▼ */
+/* ---------------------------------------------------- */
+
+/* 상단 광고 컨테이너 (여백 정리) */
+.ad-top-container {
+    text-align: center;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+/* 1. PC 가로형 (728x90) 기본 설정 */
+.ad-pc-horizontal {
+    display: block; /* 기본적으로 보임 */
+}
+
+/* 2. 모바일 띠배너 (320x50) 기본 설정 */
+.ad-mobile-banner {
+    display: none;  /* 기본적으로 숨김 (PC니까) */
+}
+
+/* 3. PC 세로형 사이드바 (160x600) 기본 설정 */
+.ad-pc-sidebar {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 20px; /* 화면 오른쪽에 고정 */
+    z-index: 1000;
+    display: block; /* 기본적으로 보임 */
+}
+
+
+/* ---------------------------------------------------- */
+/* ▼ [모바일/태블릿 화면일 때 동작] (미디어 쿼리) ▼ */
+/* ---------------------------------------------------- */
+
+/* 화면이 1200px보다 작을 때 (작은 노트북, 태블릿) */
+/* -> 사이드바 광고가 본문을 가리므로 숨깁니다. */
+@media (max-width: 1200px) {
+    .ad-pc-sidebar {
+        display: none !important; 
+    }
+}
+
+/* 화면이 768px보다 작을 때 (스마트폰) */
+/* -> PC 가로형을 숨기고, 모바일 띠배너를 보여줍니다. */
+@media (max-width: 768px) {
+    .ad-pc-horizontal {
+        display: none !important;
+    }
+    .ad-mobile-banner {
+        display: block !important;
     }
 }
