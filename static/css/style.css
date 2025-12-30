@@ -130,7 +130,8 @@ button:hover { background-color: #0056b3; }
 /* 2열 그리드 배치 (좌우 나란히) */
 .input-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* 최소 200px 너비 확보, 공간이 부족하면 자동으로 줄바꿈 */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
     gap: 15px;
     margin-bottom: 20px;
 }
@@ -348,5 +349,8 @@ input[type="date"] {
     background-color: #fff;
     cursor: pointer;
     color: #333;
-    appearance: none; /* 브라우저 기본 스타일 제거 */
+    appearance: none;
+    width: 100%;       /* 가로 꽉 채우기 */
+    box-sizing: border-box; /* 테두리 포함 크기 계산 */
+    padding: 12px;     /* 내부 여백 넉넉하게 */
 }

@@ -99,7 +99,6 @@
                     <div class="toggle-radio-group">
                         <input type="radio" id="juhyu_no" name="juhyu_state" value="excluded" checked>
                         <label for="juhyu_no">미포함</label>
-                        
                         <input type="radio" id="juhyu_yes" name="juhyu_state" value="included">
                         <label for="juhyu_yes">포함</label>
                     </div>
@@ -119,7 +118,6 @@
                     <div class="toggle-radio-group">
                         <input type="radio" id="prob_no" name="probation" value="no" checked>
                         <label for="prob_no">미적용</label>
-                        
                         <input type="radio" id="prob_yes" name="probation" value="yes">
                         <label for="prob_yes">적용</label>
                     </div>
@@ -175,7 +173,6 @@
                 {% endif %}
 
                 <h4 style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">공제 내역</h4>
-                
                 <div style="font-size: 1rem;">
                     {% if pension > 0 %}<div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>국민연금</span> <span>{{ "{:,}".format(pension) }}원</span></div>{% endif %}
                     {% if health > 0 %}<div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>건강보험</span> <span>{{ "{:,}".format(health) }}원</span></div>{% endif %}
@@ -201,15 +198,90 @@
         </div>
     {% endif %}
 
-    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 10px; line-height: 1.6; color: #555;">
-        <h3>💡 2025년 급여 계산 기준 안내</h3>
-        <ul>
-            <li><strong>최저시급:</strong> 2025년 최저시급은 <strong>10,030원</strong>입니다.</li>
-            <li><strong>주휴수당:</strong> 1주 15시간 이상 근무 시, 시급의 약 20%가 추가 발생합니다.</li>
-            <li><strong>4대보험 요율:</strong> 국민연금 4.5%, 건강보험 3.545%, 장기요양 12.95%, 고용보험 0.9%가 적용됩니다.</li>
-        </ul>
-    </div>
-
     <script>
+        // 초기 로딩 시 기본값(직장인)에 맞춰 설정
+        window.onload = function() {
+            toggleOptions('salary');
+        }
+
         function toggleOptions(type) {
-            const salaryInputGroup =
+            const salaryInputGroup = document.getElementById('salary-input-group');
+            const hourlyOptions = document.getElementById('hourly-options');
+            const salaryOptions = document.getElementById('salary-options');
+            const advOptions = document.getElementById('advanced-options');
+
+            // 1. 모든 입력창 비활성화 (disabled) -> 서버로 값 전송 안 됨
+            toggleInputs(salaryInputGroup, true);
+            toggleInputs(hourlyOptions, true);
+            
+            // 2. 선택된 탭만 보여주고 활성화 (disabled = false)
+            if (type === 'hourly') {
+                // [알바 선택]
+                salaryInputGroup.style.display = 'none';
+                hourlyOptions.style.display = 'block';
+                advOptions.style.display = 'none';
+                
+                toggleInputs(hourlyOptions, false); // 알바 입력창 활성화
+                
+            } else if (type === 'freelancer') {
+                // [프리랜서 선택]
+                salaryInputGroup.style.display = 'block';
+                hourlyOptions.style.display = 'none';
+                salaryOptions.style.display = 'none'; // 연봉/월급 옵션 숨김
+                advOptions.style.display = 'none';
+                
+                toggleInputs(salaryInputGroup, false); // 금액 입력창 활성화
+                
+            } else {
+                // [직장인 선택]
+                salaryInputGroup.style.display = 'block';
+                hourlyOptions.style.display = 'none';
+                salaryOptions.style.display = 'grid';
+                advOptions.style.display = 'block';
+                
+                toggleInputs(salaryInputGroup, false); // 금액 입력창 활성화
+                toggleInputs(advOptions, false);       // 부양가족 입력창 활성화
+            }
+        }
+
+        // 특정 영역 안의 모든 input/select를 비활성화/활성화 하는 헬퍼 함수
+        function toggleInputs(element, isDisabled) {
+            if (!element) return;
+            const inputs = element.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.disabled = isDisabled;
+            });
+        }
+        
+        function changeVal(id, delta) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) || 0;
+            val += delta;
+            if (val < 0) val = 0;
+            input.value = val;
+        }
+
+        function convertMoney(input, targetId, unitMultiplier) {
+            const val = input.value;
+            const target = document.getElementById(targetId);
+            if (!val || val == 0) { target.innerText = "0원"; return; }
+            const numberVal = parseInt(val) * unitMultiplier;
+            const unitWords = ['', '만', '억', '조'];
+            let result = '';
+            let num = numberVal;
+            let count = 0;
+            while (num > 0) {
+                let mod = num % 10000;
+                if (mod > 0) {
+                    result = formatNumber(mod) + unitWords[count] + ' ' + result;
+                }
+                num = Math.floor(num / 10000);
+                count++;
+            }
+            target.innerText = result + "원";
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+{% endblock %}
