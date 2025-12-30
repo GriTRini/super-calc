@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}모두의 계산기{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧮 모두의 만능 계산기</h1>
+            <nav>
+                <a href="/">🏠 홈</a>
+                <a href="/salary">💰 급여(3.3%)</a>
+                </nav>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer style="margin-top: 50px; color: #999; font-size: 0.8rem; text-align: center;">
+            <p>© 2025 Super Calculator Project. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
