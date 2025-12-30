@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-533DZQW8');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -16,25 +11,8 @@
     <meta property="og:description" content="복잡한 계산, 이제 1초 만에 해결하세요.">
 
     <link rel="stylesheet" href="/static/css/style.css">
-    
-    <style>
-        .ad-container {
-            text-align: center;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-        .ad-pc { display: block; }
-        .ad-mobile { display: none; }
-        @media (max-width: 768px) {
-            .ad-pc { display: none; }
-            .ad-mobile { display: block; }
-        }
-    </style>
 </head>
 <body>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-533DZQW8"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container">
         <header>
             <h1>🧮 모두의 만능 계산기</h1>
@@ -47,19 +25,6 @@
             </nav>
         </header>
 
-        <div class="ad-container">
-            <div class="ad-pc">
-                <p style="color: #999; font-size: 0.8rem;">PC 광고 영역 (728x90)</p>
-            </div>
-            <div class="ad-mobile">
-                <ins class="kakao_ad_area" style="display:none;"
-                 data-ad-unit    = "DAN-L0oTg9DqyK7ZvQZs"
-                 data-ad-width   = "300"
-                 data-ad-height  = "250"></ins>
-                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-            </div>
-        </div>
-
         <main>
             {% block content %}{% endblock %}
         </main>
@@ -68,5 +33,13 @@
             <p>© 2025 Super Calculator Project. All rights reserved.</p>
         </footer>
     </div>
-</body>
+
+    <div class="kakao-ad-sidebar">
+        <ins class="kakao_ad_area" style="display:none;"
+             data-ad-unit    = "DAN-4w8RFBcfzSMahtB8"
+             data-ad-width   = "160"
+             data-ad-height  = "600"></ins>
+        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+    </div>
+    </body>
 </html>
