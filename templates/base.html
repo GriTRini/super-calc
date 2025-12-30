@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}모두의 계산기{% endblock %}</title>
+    
+    <title>{% block title %}모두의 계산기 - 2025 급여, 부동산, 퇴직금 계산{% endblock %}</title>
+    <meta name="description" content="{% block description %}연봉 실수령액, 알바 시급, 부동산 중개수수료, 퇴직금을 2025년 최신 기준으로 한 번에 계산하세요.{% endblock %}">
+    <meta name="keywords" content="연봉계산기, 실수령액, 2025최저시급, 부동산복비, 퇴직금계산기, 주휴수당계산기">
+    <meta property="og:title" content="모두의 만능 계산기">
+    <meta property="og:description" content="복잡한 계산, 이제 1초 만에 해결하세요.">
+
     <link rel="stylesheet" href="/static/css/style.css">
     
     <style>
@@ -28,8 +34,11 @@
             
             <nav>
                 <a href="/">🏠 홈</a>
+                <a href="/salary">💰 통합 급여</a>
+                <a href="/severance">💼 퇴직금</a>
+                <a href="/real-estate">🏠 부동산 복비</a>
             </nav>
-            </header>
+        </header>
 
         <div class="ad-container">
             <div class="ad-pc">

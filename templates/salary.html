@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}2025 전문 급여 계산기{% endblock %}
+{% block title %}2025 전문 급여 계산기 (연봉/시급/프리랜서){% endblock %}
+
+{% block description %}2025년 최신 요율 반영! 연봉 실수령액, 알바 주휴수당, 4대보험, 프리랜서 3.3% 세금까지 정확하게 계산해 드립니다.{% endblock %}
 
 {% block content %}
     <h2>💰 전문 급여 계산기</h2>
@@ -124,7 +126,6 @@
                 </div>
             </div>
 
-
             <div id="advanced-options">
                 <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ddd;">
                 <div class="input-grid">
@@ -200,62 +201,15 @@
         </div>
     {% endif %}
 
+    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 10px; line-height: 1.6; color: #555;">
+        <h3>💡 2025년 급여 계산 기준 안내</h3>
+        <ul>
+            <li><strong>최저시급:</strong> 2025년 최저시급은 <strong>10,030원</strong>입니다.</li>
+            <li><strong>주휴수당:</strong> 1주 15시간 이상 근무 시, 시급의 약 20%가 추가 발생합니다.</li>
+            <li><strong>4대보험 요율:</strong> 국민연금 4.5%, 건강보험 3.545%, 장기요양 12.95%, 고용보험 0.9%가 적용됩니다.</li>
+        </ul>
+    </div>
+
     <script>
         function toggleOptions(type) {
-            const salaryInputGroup = document.getElementById('salary-input-group'); // 직장인 금액입력창
-            const hourlyOptions = document.getElementById('hourly-options');       // 알바 상세옵션
-            const salaryOptions = document.getElementById('salary-options');       // 연봉/월급 선택
-            const advOptions = document.getElementById('advanced-options');        // 고급설정 (부양가족 등)
-
-            if (type === 'hourly') {
-                // 알바 선택 시
-                salaryInputGroup.style.display = 'none'; // 기본 금액 입력창 숨김
-                hourlyOptions.style.display = 'block';   // 알바 상세폼 보임
-                advOptions.style.display = 'none';       // [변경] 부양가족/비과세 숨김
-            } else if (type === 'freelancer') {
-                // 프리랜서
-                salaryInputGroup.style.display = 'block';
-                hourlyOptions.style.display = 'none';
-                salaryOptions.style.display = 'none';
-                advOptions.style.display = 'none';       // 프리랜서도 숨김
-            } else {
-                // 직장인 (기본)
-                salaryInputGroup.style.display = 'block';
-                hourlyOptions.style.display = 'none';
-                salaryOptions.style.display = 'grid';
-                advOptions.style.display = 'block';      // 직장인만 고급설정 보임
-            }
-        }
-        
-        function changeVal(id, delta) {
-            const input = document.getElementById(id);
-            let val = parseInt(input.value) || 0;
-            val += delta;
-            if (val < 0) val = 0;
-            input.value = val;
-        }
-
-        function convertMoney(input, targetId, unitMultiplier) {
-            const val = input.value;
-            const target = document.getElementById(targetId);
-            if (!val || val == 0) { target.innerText = "0원"; return; }
-            const numberVal = parseInt(val) * unitMultiplier;
-            const unitWords = ['', '만', '억', '조'];
-            let result = '';
-            let num = numberVal;
-            let count = 0;
-            while (num > 0) {
-                let mod = num % 10000;
-                if (mod > 0) {
-                    result = formatNumber(mod) + unitWords[count] + ' ' + result;
-                }
-                num = Math.floor(num / 10000);
-                count++;
-            }
-            target.innerText = result + "원";
-        }
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-    </script>
-{% endblock %}
+            const salaryInputGroup =
