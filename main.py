@@ -8,7 +8,6 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 2. 라우터 등록
-# phone.py의 router를 메인 앱에 연결합니다.
 app.include_router(phone.router)
 
 # ==========================================================
@@ -16,21 +15,15 @@ app.include_router(phone.router)
 # ==========================================================
 @app.get("/ping")
 async def ping():
-    # 이 경로는 아무런 연산 없이 즉시 응답하므로
-    # 서버가 깨어나는지 확인하는 용도로 적합합니다.
     return {"status": "alive"}
-
 
 # ==========================================================
 # [SEO] 검색엔진 최적화 및 소유권 확인
 # ==========================================================
-
-# 구글 소유권 확인
 @app.get("/google30ad8eaea48a0cb8.html", include_in_schema=False)
 async def google_verification():
     return Response(content="google-site-verification: google30ad8eaea48a0cb8", media_type="text/html")
 
-# Robots.txt
 @app.get("/robots.txt", include_in_schema=False)
 async def robots_txt():
     content = """User-agent: *
@@ -39,10 +32,8 @@ Sitemap: https://super-calc.onrender.com/sitemap.xml
 """
     return Response(content=content, media_type="text/plain")
 
-# Sitemap.xml
 @app.get("/sitemap.xml", include_in_schema=False)
 async def sitemap_xml():
-    # 실제 도메인 주소로 설정
     base_url = "https://super-calc.onrender.com"
     content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

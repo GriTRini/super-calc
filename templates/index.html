@@ -23,7 +23,6 @@
     }
 
     /* 2. 입력창 디자인 */
-    /* text 타입이지만 숫자 키패드가 뜨도록 inputmode 설정됨 */
     input[type="text"], input[type="number"], select {
         width: 100%;
         padding: 12px;
@@ -31,8 +30,8 @@
         border-radius: 8px;
         font-size: 1rem;
         box-sizing: border-box;
-        text-align: right; /* 숫자는 오른쪽 정렬이 국룰 */
-        font-family: 'Pretendard', sans-serif; /* 숫자 폰트 깔끔하게 */
+        text-align: right; 
+        font-family: 'Pretendard', sans-serif;
     }
 
     input:focus, select:focus { border-color: #007bff; outline: none; }
@@ -41,17 +40,18 @@
     input:disabled {
         background-color: #e9ecef !important;
         color: #adb5bd !important;
+        border-color: #ced4da !important;
         cursor: not-allowed;
     }
 
-    /* 한글 금액 표시 (우측 하단) */
+    /* 한글 금액 표시 */
     .unit-text {
         text-align: right;
         font-size: 0.85rem;
         color: #007bff;
         margin-top: 4px;
         font-weight: bold;
-        min-height: 1.2em; /* 공간 확보 */
+        min-height: 1.2em; 
     }
 
     /* 3. 그리드 */
@@ -72,6 +72,25 @@
     .result-col { flex: 1; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; }
     .result-divider { width: 1px; background-color: #eee; margin: 20px 0; }
     .winner-bg { background-color: #f0f7ff; }
+
+    /* 분석 팁 박스 */
+    .tip-box {
+        margin-top: 15px;
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    .tip-highlight {
+        font-weight: bold;
+        color: #d32f2f;
+        background: rgba(255,255,255,0.5);
+        padding: 0 5px;
+        border-radius: 4px;
+    }
 </style>
 
 <div class="calc-container">
@@ -246,6 +265,37 @@
                 </div>
             </div>
         </div>
+
+        <div style="padding: 0 20px 20px 20px;">
+            {% if winner == 'self' %}
+            <div class="tip-box">
+                <h4 style="margin: 0 0 10px 0; color: #856404;">💡 통신사 개통이 이득이 되려면?</h4>
+                <p style="margin: 5px 0;">현재 조건에서는 자급제가 더 저렴합니다. 성지에서 아래 조건을 맞춰달라고 해보세요:</p>
+                <ul style="margin: 10px 0 0 20px; padding: 0;">
+                    <li>
+                        대리점 지원금(징)을 <span class="tip-highlight">
+                        {{ "{:,}".format(input_store_subsidy + needed_additional_subsidy) }}원 이상</span> 받아야 본전입니다.
+                        <br><span style="font-size: 0.8em; color: #666;">(현재보다 약 {{ "{:,}".format(needed_additional_subsidy) }}원 더 필요)</span>
+                    </li>
+                    <li style="margin-top: 8px;">
+                        또는, 월 요금제를 <span class="tip-highlight">
+                        {% if target_monthly_plan > 0 %}
+                            약 {{ "{:,}".format(target_monthly_plan) }}원
+                        {% else %}
+                            0원 (현실적 불가능)
+                        {% endif %}
+                        </span> 수준으로 낮춰야 합니다.
+                    </li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="tip-box" style="background-color: #d4edda; border-color: #c3e6cb; color: #155724;">
+                <h4 style="margin: 0 0 5px 0;">🎉 축하합니다!</h4>
+                <p style="margin: 0;">현재 대리점/성지 조건이 자급제보다 <strong>{{ "{:,}".format(diff_price) }}원</strong> 저렴합니다.</p>
+                <p style="margin: 5px 0; font-size: 0.9em;">이대로 졸업(구매)하셔도 좋은 조건입니다!</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
     {% endif %}
 </div>
@@ -253,13 +303,8 @@
 <script>
     // 1. 숫자 포맷팅 (콤마 + 한글 변환)
     function formatNumber(input) {
-        // 숫자만 남기기
         let rawValue = input.value.replace(/[^0-9]/g, '');
-        
-        // 0 제거 (맨 앞의 0)
-        if(rawValue.length > 1 && rawValue.startsWith('0')) {
-            rawValue = rawValue.substring(1);
-        }
+        if(rawValue.length > 1 && rawValue.startsWith('0')) rawValue = rawValue.substring(1);
 
         if (!rawValue) {
             input.value = '';
@@ -267,80 +312,54 @@
             return;
         }
 
-        // 콤마 추가해서 입력창에 반영
         input.value = Number(rawValue).toLocaleString();
-
-        // 한글 단위 변환 (예: 500000 -> 50만원)
         let unitText = convertToKoreanNumber(rawValue);
-        
-        // 해당 input의 id를 이용해 unit 텍스트 div 찾기
         let unitDiv = document.getElementById('unit_' + input.id);
-        if (unitDiv) {
-            unitDiv.innerText = unitText;
-        }
+        if (unitDiv) unitDiv.innerText = unitText;
     }
 
-    // 한글 금액 변환 헬퍼 함수
     function convertToKoreanNumber(num) {
         let number = parseInt(num, 10);
         if (isNaN(number) || number === 0) return '';
-        
         let result = '';
-        let tenThousand = Math.floor(number / 10000); // 만 단위
-        let rest = number % 10000; // 나머지
+        let tenThousand = Math.floor(number / 10000);
+        let rest = number % 10000;
 
         if (tenThousand > 0) {
-            // 억 단위 체크
             let hundredMillion = Math.floor(tenThousand / 10000);
             let restTenThousand = tenThousand % 10000;
-
-            if (hundredMillion > 0) {
-                result += hundredMillion + '억 ';
-            }
-            if (restTenThousand > 0) {
-                result += restTenThousand + '만 ';
-            } else if (hundredMillion === 0) {
-                 result += tenThousand + '만 ';
-            } else {
-                 // 1억 0만 -> 1억
-            }
+            if (hundredMillion > 0) result += hundredMillion + '억 ';
+            if (restTenThousand > 0) result += restTenThousand + '만 ';
+            else if (hundredMillion === 0) result += tenThousand + '만 ';
         }
-        
-        if (rest > 0) {
-            result += rest;
-        }
-        
+        if (rest > 0) result += rest;
         return result + '원';
     }
 
-    // 2. 폼 제출 시 콤마 제거 (서버는 int만 받으므로)
+    // 2. 폼 제출 시 콤마 제거
     function prepareSubmit() {
-        // text 타입이고 onkeyup이 있는 모든 인풋 찾기
         const inputs = document.querySelectorAll('input[type="text"][onkeyup]');
         inputs.forEach(input => {
-            // 콤마 제거
             input.value = input.value.replace(/,/g, '');
         });
-        return true; // 폼 제출 진행
+        return true;
     }
 
-    // 3. 기기 변경 시 가격 업데이트
+    // 3. 기기 가격 업데이트
     function updatePrice() {
         const select = document.getElementById("phone_select");
         const priceInput = document.getElementById("device_price");
-        
         if (select && priceInput) {
             const selectedOption = select.options[select.selectedIndex];
             const price = selectedOption.dataset.price; 
-            
             if (price) {
-                priceInput.value = price; // 일단 값 넣고
-                formatNumber(priceInput); // 콤마+한글 적용
+                priceInput.value = price;
+                formatNumber(priceInput);
             }
         }
     }
 
-    // 4. 선택약정/공시지원금 토글
+    // 4. 공시지원금 토글
     function checkSubsidyStatus() {
         const checkedRadio = document.querySelector('input[name="carrier_type"]:checked');
         const subsidyInput = document.getElementById("subsidy_input");
@@ -349,7 +368,7 @@
         if (checkedRadio && subsidyInput) {
             if (checkedRadio.value === 'seonyak') {
                 subsidyInput.disabled = true;
-                subsidyInput.value = ''; // 0으로 보이게 하거나 비움
+                subsidyInput.value = '';
                 subsidyInput.style.backgroundColor = '#e9ecef';
                 subsidyInput.placeholder = "지원금 없음";
                 if(subsidyUnit) subsidyUnit.innerText = '';
@@ -363,13 +382,9 @@
 
     // 5. 초기화
     window.addEventListener('DOMContentLoaded', function() {
-        // 모든 포맷팅 대상 인풋 초기화 (이미 값이 있는 경우 포맷팅 적용)
         const inputs = document.querySelectorAll('input[type="text"][onkeyup]');
-        inputs.forEach(input => {
-            formatNumber(input);
-        });
-
-        // 결과화면 아닐때만 가격 자동 선택
+        inputs.forEach(input => formatNumber(input));
+        
         {% if not result %}
             updatePrice();
         {% endif %}
@@ -377,5 +392,4 @@
         checkSubsidyStatus();
     });
 </script>
-
 {% endblock %}
