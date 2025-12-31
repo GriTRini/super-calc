@@ -11,6 +11,15 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # phone.py의 router를 메인 앱에 연결합니다.
 app.include_router(phone.router)
 
+# ==========================================================
+# [모니터링] 서버 절전 방지용 (UptimeRobot 연결)
+# ==========================================================
+@app.get("/ping")
+async def ping():
+    # 이 경로는 아무런 연산 없이 즉시 응답하므로
+    # 서버가 깨어나는지 확인하는 용도로 적합합니다.
+    return {"status": "alive"}
+
 
 # ==========================================================
 # [SEO] 검색엔진 최적화 및 소유권 확인
