@@ -1,139 +1,381 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h2 style="font-size: 1.8rem; color: #333;">📉 2년 총 비용, 어디가 더 쌀까?</h2>
-        <p style="color: #666;">기기값과 요금제를 합친 <span style="color: #d32f2f; font-weight: bold;">진짜 비용</span>을 비교해 드립니다.</p>
-    </div>
+<style>
+    /* 1. 전체 레이아웃 */
+    .calc-container { max-width: 100%; box-sizing: border-box; }
     
-    <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        
-        <form action="/calc" method="post">
+    .section-box {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        word-break: keep-all; 
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #555;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    /* 2. 입력창 디자인 */
+    /* text 타입이지만 숫자 키패드가 뜨도록 inputmode 설정됨 */
+    input[type="text"], input[type="number"], select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        text-align: right; /* 숫자는 오른쪽 정렬이 국룰 */
+        font-family: 'Pretendard', sans-serif; /* 숫자 폰트 깔끔하게 */
+    }
+
+    input:focus, select:focus { border-color: #007bff; outline: none; }
+
+    /* 비활성화 스타일 */
+    input:disabled {
+        background-color: #e9ecef !important;
+        color: #adb5bd !important;
+        cursor: not-allowed;
+    }
+
+    /* 한글 금액 표시 (우측 하단) */
+    .unit-text {
+        text-align: right;
+        font-size: 0.85rem;
+        color: #007bff;
+        margin-top: 4px;
+        font-weight: bold;
+        min-height: 1.2em; /* 공간 확보 */
+    }
+
+    /* 3. 그리드 */
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .input-grid { grid-template-columns: 1fr; } }
+
+    /* 4. 결과 박스 */
+    .result-box {
+        margin-top: 30px;
+        border-radius: 15px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border: 2px solid #eee;
+    }
+    .result-header { padding: 20px; text-align: center; color: white; }
+    .result-body { display: flex; position: relative; }
+    .result-col { flex: 1; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; }
+    .result-divider { width: 1px; background-color: #eee; margin: 20px 0; }
+    .winner-bg { background-color: #f0f7ff; }
+</style>
+
+<div class="calc-container">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="font-size: 1.8rem; color: #333; margin-bottom: 10px;">📉 자급제 vs 성지 가격 비교</h2>
+        <p style="color: #666;">초기 6개월 요금제 유지 조건까지 <span style="color: #d32f2f; font-weight: bold;">완벽 반영!</span></p>
+    </div>
+
+    <div class="section-box">
+        <form action="/calc" method="post" id="calcForm" onsubmit="return prepareSubmit()">
             
-            <div style="margin-bottom: 30px; text-align: center;">
-                <span class="form-label" style="font-size: 1.2rem;">📱 구매할 기종</span>
-                <select name="phone_code" class="wide-select" style="font-size: 1.1rem; padding: 10px; margin-top: 10px;" onchange="updatePrices(this)">
-                    {% for code, info in phones.items() %}
-                    <option value="{{ code }}" 
-                            data-market="{{ info.market_price }}" 
-                            data-store="{{ info.store_price }}"
-                            {% if selected_code == code %}selected{% endif %}>
-                        {{ info.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <p style="font-size: 0.8rem; color: #888; margin-top:5px;">
-                    * 2025년 12월 기준 인터넷 최저가 및 통신사 출고가 반영
-                </p>
+            <div style="margin-bottom: 30px; background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef;">
+                <div style="margin-bottom: 15px;">
+                    <span class="form-label">📱 비교할 기기 선택</span>
+                    <select name="phone_code" id="phone_select" onchange="updatePrice()" style="text-align: left;">
+                        {% for code, info in phones.items() %}
+                        <option value="{{ code }}" data-price="{{ info.price }}" {% if selected_code == code %}selected{% endif %}>
+                            {{ info.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <span class="form-label">💰 기기값 (직접 수정 가능)</span>
+                    <input type="text" inputmode="numeric" name="device_price" id="device_price" 
+                           value="{{ input_price|default(0) }}" 
+                           onkeyup="formatNumber(this)" 
+                           style="border: 2px solid #007bff; font-weight: bold;">
+                    <div id="unit_device_price" class="unit-text"></div>
+                </div>
             </div>
 
-            <hr style="border: 0; border-top: 2px dashed #ddd; margin-bottom: 30px;">
-
-            <div class="input-grid" style="align-items: start;">
-                
-                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
-                    <h3 style="text-align: center; color: #333; margin-bottom: 20px;">🪙 자급제 + 알뜰폰</h3>
-                    <div style="margin-bottom: 15px;">
-                        <span class="form-label">기기값 (인터넷 최저가)</span>
-                        <input type="text" id="disp_market_price" class="readonly-input" value="0원" readonly>
-                    </div>
+            <div class="input-grid">
+                <div style="background-color: #fff; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
+                    <h3 style="text-align: center; color: #333; margin-bottom: 20px; font-size: 1.2rem;">🪙 자급제 + 알뜰폰</h3>
                     <div style="margin-bottom: 15px;">
                         <span class="form-label">알뜰폰 요금제 (월)</span>
-                        <input type="number" name="mvno_cost" placeholder="33000" value="{{ input_mvno|default(33000) }}" 
-                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <input type="text" inputmode="numeric" name="mvno_cost" id="mvno_cost"
+                               placeholder="33,000" value="{{ input_mvno|default(33000) }}" 
+                               onkeyup="formatNumber(this)">
+                        <div id="unit_mvno_cost" class="unit-text"></div>
                     </div>
                 </div>
 
                 <div style="background-color: #e3f2fd; padding: 20px; border-radius: 10px; border: 1px solid #90caf9;">
-                    <h3 style="text-align: center; color: #0d47a1; margin-bottom: 20px;">🏢 통신사 약정 개통</h3>
-                    <div style="margin-bottom: 15px;">
-                        <span class="form-label">출고가 (정가)</span>
-                        <input type="text" id="disp_store_price" class="readonly-input" value="0원" readonly>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <span class="form-label">5G 요금제 (월)</span>
-                        <input type="number" name="plan_cost" id="plan_cost" placeholder="90000" value="{{ input_plan|default(90000) }}"
-                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                    </div>
-                    <div style="margin-bottom: 15px; background: white; padding: 10px; border-radius: 5px;">
-                        <span class="form-label" style="margin-bottom: 5px; display:block;">할인 방식</span>
-                        <div style="display: flex; gap: 15px;">
-                            <label style="cursor: pointer;"><input type="radio" name="carrier_type" value="gongsi" onclick="toggleCarrierType('gongsi')" {% if carrier_type == 'gongsi' or carrier_type is not defined %}checked{% endif %}> 공시지원금</label>
-                            <label style="cursor: pointer;"><input type="radio" name="carrier_type" value="seonyak" onclick="toggleCarrierType('seonyak')" {% if carrier_type == 'seonyak' %}checked{% endif %}> 선택약정</label>
+                    <h3 style="text-align: center; color: #0d47a1; margin-bottom: 20px; font-size: 1.2rem;">🏢 통신사 약정</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <span class="form-label">할인 방식 선택</span>
+                        <div style="display: flex; gap: 10px; background: white; padding: 10px; border-radius: 8px;">
+                            <label style="cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <input type="radio" name="carrier_type" value="gongsi" onclick="checkSubsidyStatus()" 
+                                {% if carrier_type == 'gongsi' or carrier_type is not defined %}checked{% endif %}> 
+                                <span>공시지원금</span>
+                            </label>
+                            <label style="cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <input type="radio" name="carrier_type" value="seonyak" onclick="checkSubsidyStatus()" 
+                                {% if carrier_type == 'seonyak' %}checked{% endif %}> 
+                                <span>선택약정</span>
+                            </label>
                         </div>
                     </div>
-                    <div id="gongsi_input_box" style="margin-bottom: 15px;">
-                        <span class="form-label">공시지원금 (기기 할인)</span>
-                        <input type="number" name="subsidy" placeholder="500000" value="{{ input_subsidy|default(500000) }}"
-                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+
+                    <div style="margin-bottom: 15px; border: 1px dashed #0d47a1; padding: 15px; border-radius: 8px; background: #f0f7ff;">
+                        <div style="margin-bottom: 10px;">
+                            <span class="form-label" style="font-size:0.9em;">① 초기 요금제 & 유지기간</span>
+                            <div style="display: flex; gap: 5px;">
+                                <div style="flex: 2;">
+                                    <input type="text" inputmode="numeric" name="plan_cost" id="plan_cost"
+                                           placeholder="예: 100,000" value="{{ input_plan|default(90000) }}"
+                                           onkeyup="formatNumber(this)">
+                                    <div id="unit_plan_cost" class="unit-text"></div>
+                                </div>
+                                <div style="flex: 1; position: relative;">
+                                    <input type="number" name="plan_period" value="{{ input_plan_period|default(6) }}" style="text-align: center;">
+                                    <span style="position: absolute; right: 5px; top: 12px; font-size: 0.8em; color: #888; pointer-events: none;">개월</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="form-label" style="font-size:0.9em;">② 이후 변경 요금제</span>
+                            <input type="text" inputmode="numeric" name="plan_cost_after" id="plan_cost_after"
+                                   placeholder="예: 69,000" value="{{ input_plan_after|default('') }}"
+                                   onkeyup="formatNumber(this)">
+                            <div id="unit_plan_cost_after" class="unit-text"></div>
+                        </div>
                     </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label">공시지원금 (기기값 할인)</span>
+                        <input type="text" inputmode="numeric" id="subsidy_input" name="subsidy" 
+                               placeholder="500,000" value="{{ input_subsidy|default(500000) }}"
+                               onkeyup="formatNumber(this)">
+                        <div id="unit_subsidy_input" class="unit-text"></div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label" style="color: #d32f2f;">💸 대리점 지원금 (징)</span>
+                        <input type="text" inputmode="numeric" name="store_subsidy" id="store_subsidy"
+                               placeholder="예: 300,000" value="{{ input_store_subsidy|default(0) }}" 
+                               style="border: 2px solid #ffcdd2; background-color: #fff5f5;"
+                               onkeyup="formatNumber(this)">
+                        <div id="unit_store_subsidy" class="unit-text"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <span class="form-label" style="color: #007bff;">➕ 부가서비스 (금액 / 개월)</span>
+                        <div style="display: flex; gap: 5px;">
+                            <div style="flex: 2;">
+                                <input type="text" inputmode="numeric" name="addon_cost" id="addon_cost"
+                                       placeholder="금액" value="{{ input_addon_cost|default('') }}" 
+                                       style="border: 1px solid #90caf9;"
+                                       onkeyup="formatNumber(this)">
+                                <div id="unit_addon_cost" class="unit-text"></div>
+                            </div>
+                            <div style="flex: 1;">
+                                <input type="number" name="addon_months" placeholder="3" value="{{ input_addon_months|default(3) }}" 
+                                       style="border: 1px solid #90caf9; text-align: center;">
+                            </div>
+                        </div>
+                    </div>
+
                     <div style="margin-bottom: 15px;">
                         <span class="form-label">추가 월 할인 (결합 등)</span>
-                        <input type="number" name="add_discount" placeholder="0" value="{{ input_add_discount|default(0) }}"
-                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <input type="text" inputmode="numeric" name="add_discount" id="add_discount"
+                               placeholder="0" value="{{ input_add_discount|default(0) }}"
+                               onkeyup="formatNumber(this)">
+                        <div id="unit_add_discount" class="unit-text"></div>
                     </div>
                 </div>
             </div>
-
-            <button type="submit" class="btn-yellow" style="margin-top: 30px; background-color: #2c3e50; color: white; font-size: 1.2rem;">💰 최저가 비교하기</button>
+            
+            <button type="submit" class="btn-yellow">💰 최저가 비교하기</button>
         </form>
     </div>
 
     {% if result %}
-        <div class="result-box" style="margin-top: 30px; border: 3px solid {% if winner == 'self' %}#333{% else %}#0d47a1{% endif %}; border-radius: 15px; overflow: hidden; background: white;">
-            <div style="background-color: {% if winner == 'self' %}#333{% else %}#0d47a1{% endif %}; color: white; padding: 20px; text-align: center;">
-                <p style="margin: 0; font-size: 1rem; opacity: 0.9;">추천 구매 방식</p>
-                <h2 style="margin: 5px 0 0 0; font-size: 2rem;">🏆 {{ recommend_text }}</h2>
-                <p style="margin-top: 5px; font-weight: bold;">(2년간 약 {{ "{:,}".format(diff_price) }}원 절약)</p>
-            </div>
-            
-            <div style="display: flex; flex-wrap: wrap; padding: 20px;">
-                <div style="flex: 1; min-width: 250px; padding: 15px; border-right: 1px dashed #ddd;">
-                    <h3 style="text-align: center;">자급제 + 알뜰폰</h3>
-                    <ul style="list-style: none; padding: 0; line-height: 1.8;">
-                        <li>• 기기값: {{ "{:,}".format(market_price) }}원</li>
-                        <li>• 24개월 요금: {{ "{:,}".format(input_mvno * 24) }}원</li>
-                        <li>• 할부수수료: 0원</li>
-                    </ul>
-                    <hr>
-                    <h2 style="text-align: center; color: #333;">{{ "{:,}".format(self_total) }}원</h2>
+    <div class="result-box" style="border-color: {% if winner == 'self' %}#333{% else %}#0d47a1{% endif %};">
+        <div class="result-header" style="background-color: {% if winner == 'self' %}#333{% else %}#0d47a1{% endif %};">
+            <h2 style="margin: 0; font-size: 1.6rem;">🏆 {{ recommend_text }}</h2>
+            <p style="margin-top: 5px; opacity: 0.9;">2년간 총 <span style="font-weight: bold; color: #ffeb3b;">{{ "{:,}".format(diff_price) }}원</span> 절약!</p>
+        </div>
+        
+        <div class="result-body">
+            <div class="result-col {% if winner == 'self' %}winner-bg{% endif %}">
+                <h3 style="color: #333; margin-bottom: 10px;">자급제</h3>
+                <div style="text-align: center;">
+                    <p style="font-size: 0.9rem; color: #666;">2년 총 비용</p>
+                    <p style="font-size: 1.6rem; font-weight: bold; color: #333; margin: 5px 0;">{{ "{:,}".format(self_total) }}원</p>
                 </div>
-                <div style="flex: 1; min-width: 250px; padding: 15px;">
-                    <h3 style="text-align: center; color: #0d47a1;">통신사 ({{ carrier_method_text }})</h3>
-                    <ul style="list-style: none; padding: 0; line-height: 1.8;">
-                        <li>• 기기값: {{ "{:,}".format(carrier_principal) }}원</li>
-                        <li>• 이자(5.9%): +{{ "{:,}".format(carrier_interest) }}원</li>
-                        <li>• 24개월 요금: {{ "{:,}".format(input_plan * 24) }}원</li>
-                        {% if discount_total > 0 %}<li style="color: red;">• 요금 할인: -{{ "{:,}".format(discount_total) }}원</li>{% endif %}
-                    </ul>
-                    <hr>
-                    <h2 style="text-align: center; color: #0d47a1;">{{ "{:,}".format(carrier_total) }}원</h2>
+                <div style="margin-top: 15px; width: 100%; font-size: 0.85rem; color: #555; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 8px;">
+                    <p>• 기기값: {{ "{:,}".format(input_price) }}원</p>
+                    <p>• 알뜰폰: {{ "{:,}".format(input_mvno * 24) }}원</p>
+                </div>
+            </div>
+
+            <div class="result-divider"></div>
+
+            <div class="result-col {% if winner == 'carrier' %}winner-bg{% endif %}">
+                <h3 style="color: #0d47a1; margin-bottom: 10px;">통신사</h3>
+                <div style="text-align: center;">
+                    <p style="font-size: 0.9rem; color: #666;">2년 총 비용</p>
+                    <p style="font-size: 1.6rem; font-weight: bold; color: #0d47a1; margin: 5px 0;">{{ "{:,}".format(carrier_total) }}원</p>
+                </div>
+                <div style="margin-top: 15px; width: 100%; font-size: 0.85rem; color: #555; background: rgba(13, 71, 161, 0.05); padding: 10px; border-radius: 8px;">
+                    <p style="display: flex; justify-content: space-between;"><span>할부원금</span><b>{{ "{:,}".format(carrier_principal) }}원</b></p>
+                    <p style="display: flex; justify-content: space-between;"><span>이자(5.9%)</span><span>+{{ "{:,}".format(carrier_interest) }}원</span></p>
+                    <p style="display: flex; justify-content: space-between;"><span>통신료</span><span>+{{ "{:,}".format(plan_total_cost) }}원</span></p>
+                    {% if input_addon_cost > 0 %}
+                    <p style="display: flex; justify-content: space-between; color: #d32f2f;"><span>부가서비스</span><span>+{{ "{:,}".format(addon_total_cost) }}원</span></p>
+                    {% endif %}
                 </div>
             </div>
         </div>
+    </div>
     {% endif %}
+</div>
 
-    <style>
-        .readonly-input { width: 100%; background-color: #eee; border: 1px solid #ccc; padding: 10px; border-radius: 5px; color: #555; font-weight: bold; }
-    </style>
-    <script>
-        function updatePrices(select) {
-            const option = select.options[select.selectedIndex];
-            if(option){
-                const market = parseInt(option.getAttribute('data-market')) || 0;
-                const store = parseInt(option.getAttribute('data-store')) || 0;
-                document.getElementById('disp_market_price').value = market.toLocaleString() + "원";
-                document.getElementById('disp_store_price').value = store.toLocaleString() + "원";
+<script>
+    // 1. 숫자 포맷팅 (콤마 + 한글 변환)
+    function formatNumber(input) {
+        // 숫자만 남기기
+        let rawValue = input.value.replace(/[^0-9]/g, '');
+        
+        // 0 제거 (맨 앞의 0)
+        if(rawValue.length > 1 && rawValue.startsWith('0')) {
+            rawValue = rawValue.substring(1);
+        }
+
+        if (!rawValue) {
+            input.value = '';
+            document.getElementById('unit_' + input.id).innerText = '';
+            return;
+        }
+
+        // 콤마 추가해서 입력창에 반영
+        input.value = Number(rawValue).toLocaleString();
+
+        // 한글 단위 변환 (예: 500000 -> 50만원)
+        let unitText = convertToKoreanNumber(rawValue);
+        
+        // 해당 input의 id를 이용해 unit 텍스트 div 찾기
+        let unitDiv = document.getElementById('unit_' + input.id);
+        if (unitDiv) {
+            unitDiv.innerText = unitText;
+        }
+    }
+
+    // 한글 금액 변환 헬퍼 함수
+    function convertToKoreanNumber(num) {
+        let number = parseInt(num, 10);
+        if (isNaN(number) || number === 0) return '';
+        
+        let result = '';
+        let tenThousand = Math.floor(number / 10000); // 만 단위
+        let rest = number % 10000; // 나머지
+
+        if (tenThousand > 0) {
+            // 억 단위 체크
+            let hundredMillion = Math.floor(tenThousand / 10000);
+            let restTenThousand = tenThousand % 10000;
+
+            if (hundredMillion > 0) {
+                result += hundredMillion + '억 ';
+            }
+            if (restTenThousand > 0) {
+                result += restTenThousand + '만 ';
+            } else if (hundredMillion === 0) {
+                 result += tenThousand + '만 ';
+            } else {
+                 // 1억 0만 -> 1억
             }
         }
-        function toggleCarrierType(type) {
-            document.getElementById('gongsi_input_box').style.display = (type === 'seonyak') ? 'none' : 'block';
+        
+        if (rest > 0) {
+            result += rest;
         }
-        window.onload = function() {
-            const select = document.querySelector('select[name="phone_code"]');
-            if(select) updatePrices(select);
-            const checkedRadio = document.querySelector('input[name="carrier_type"]:checked');
-            if(checkedRadio) toggleCarrierType(checkedRadio.value);
+        
+        return result + '원';
+    }
+
+    // 2. 폼 제출 시 콤마 제거 (서버는 int만 받으므로)
+    function prepareSubmit() {
+        // text 타입이고 onkeyup이 있는 모든 인풋 찾기
+        const inputs = document.querySelectorAll('input[type="text"][onkeyup]');
+        inputs.forEach(input => {
+            // 콤마 제거
+            input.value = input.value.replace(/,/g, '');
+        });
+        return true; // 폼 제출 진행
+    }
+
+    // 3. 기기 변경 시 가격 업데이트
+    function updatePrice() {
+        const select = document.getElementById("phone_select");
+        const priceInput = document.getElementById("device_price");
+        
+        if (select && priceInput) {
+            const selectedOption = select.options[select.selectedIndex];
+            const price = selectedOption.dataset.price; 
+            
+            if (price) {
+                priceInput.value = price; // 일단 값 넣고
+                formatNumber(priceInput); // 콤마+한글 적용
+            }
         }
-    </script>
+    }
+
+    // 4. 선택약정/공시지원금 토글
+    function checkSubsidyStatus() {
+        const checkedRadio = document.querySelector('input[name="carrier_type"]:checked');
+        const subsidyInput = document.getElementById("subsidy_input");
+        const subsidyUnit = document.getElementById("unit_subsidy_input");
+        
+        if (checkedRadio && subsidyInput) {
+            if (checkedRadio.value === 'seonyak') {
+                subsidyInput.disabled = true;
+                subsidyInput.value = ''; // 0으로 보이게 하거나 비움
+                subsidyInput.style.backgroundColor = '#e9ecef';
+                subsidyInput.placeholder = "지원금 없음";
+                if(subsidyUnit) subsidyUnit.innerText = '';
+            } else {
+                subsidyInput.disabled = false;
+                subsidyInput.style.backgroundColor = 'white';
+                subsidyInput.placeholder = "500,000";
+            }
+        }
+    }
+
+    // 5. 초기화
+    window.addEventListener('DOMContentLoaded', function() {
+        // 모든 포맷팅 대상 인풋 초기화 (이미 값이 있는 경우 포맷팅 적용)
+        const inputs = document.querySelectorAll('input[type="text"][onkeyup]');
+        inputs.forEach(input => {
+            formatNumber(input);
+        });
+
+        // 결과화면 아닐때만 가격 자동 선택
+        {% if not result %}
+            updatePrice();
+        {% endif %}
+        
+        checkSubsidyStatus();
+    });
+</script>
+
 {% endblock %}

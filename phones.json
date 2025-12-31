@@ -1,192 +1,110 @@
 {
     "s25_256": {
         "name": "갤럭시 S25 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1155000
     },
     "s25_512": {
         "name": "갤럭시 S25 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1298000
+    },
+    "s25FE_256": {
+        "name": "갤럭시FE S25 (256GB)",
+        "price": 946000
     },
     "s25_plus_256": {
         "name": "갤럭시 S25+ (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1353000
     },
     "s25_plus_512": {
         "name": "갤럭시 S25+ (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1496000
     },
     "s25_ultra_256": {
         "name": "갤럭시 S25 울트라 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1593200
     },
     "s25_ultra_512": {
         "name": "갤럭시 S25 울트라 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1728300
     },
     "s25_ultra_1tb": {
         "name": "갤럭시 S25 울트라 (1TB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2000500
     },
     "s25_edge_256": {
         "name": "갤럭시 S25 엣지 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1496000
+    },
+    "s25_edge_512": {
+        "name": "갤럭시 S25 엣지 (512GB)",
+        "price": 1639000
     },
     "zflip7_256": {
         "name": "갤럭시 Z플립7 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1485000
     },
     "zflip7_512": {
         "name": "갤럭시 Z플립7 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1643400
     },
     "zfold7_256": {
         "name": "갤럭시 Z폴드7 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2379300
     },
     "zfold7_512": {
         "name": "갤럭시 Z폴드7 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2537700
     },
     "zfold7_1tb": {
         "name": "갤럭시 Z폴드7 (1TB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_128": {
-        "name": "아이폰 16 (128GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_256": {
-        "name": "아이폰 16 (256GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_512": {
-        "name": "아이폰 16 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2933700
     },
     "iphone16e_128": {
         "name": "아이폰 16e (128GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 990000
     },
     "iphone16e_256": {
         "name": "아이폰 16e (256GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_plus_128": {
-        "name": "아이폰 16 플러스 (128GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_plus_256": {
-        "name": "아이폰 16 플러스 (256GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_plus_512": {
-        "name": "아이폰 16 플러스 (512GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_pro_128": {
-        "name": "아이폰 16 프로 (128GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_pro_256": {
-        "name": "아이폰 16 프로 (256GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_pro_512": {
-        "name": "아이폰 16 프로 (512GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_pro_1tb": {
-        "name": "아이폰 16 프로 (1TB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_promax_256": {
-        "name": "아이폰 16 프로 맥스 (256GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_promax_512": {
-        "name": "아이폰 16 프로 맥스 (512GB)",
-        "market_price": 0,
-        "store_price": 0
-    },
-    "iphone16_promax_1tb": {
-        "name": "아이폰 16 프로 맥스 (1TB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 114000
     },
     "iphone17_256": {
         "name": "아이폰 17 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1290000
     },
     "iphone17_512": {
         "name": "아이폰 17 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1590000
     },
     "iphone17_air_256": {
         "name": "아이폰 17 에어 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1510500
     },
     "iphone17_air_512": {
         "name": "아이폰 17 에어 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1795500
     },
     "iphone17_pro_256": {
         "name": "아이폰 17 프로 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1790000
     },
     "iphone17_pro_512": {
         "name": "아이폰 17 프로 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2090000
     },
     "iphone17_pro_1tb": {
         "name": "아이폰 17 프로 (1TB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2390000
     },
     "iphone17_promax_256": {
         "name": "아이폰 17 프로 맥스 (256GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 1990000
     },
     "iphone17_promax_512": {
         "name": "아이폰 17 프로 맥스 (512GB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2290000
     },
     "iphone17_promax_1tb": {
         "name": "아이폰 17 프로 맥스 (1TB)",
-        "market_price": 0,
-        "store_price": 0
+        "price": 2590000
     }
 }

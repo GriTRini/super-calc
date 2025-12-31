@@ -1,29 +1,39 @@
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from routers import phone  # 다른 라우터 제거, phone만 남김
+from routers import phone  # routers 폴더의 phone.py 가져오기
 
 app = FastAPI()
 
+# 1. 정적 파일 마운트 (CSS, JS, 이미지)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
 
-# 폰 계산기 라우터 등록
+# 2. 라우터 등록
+# phone.py의 router를 메인 앱에 연결합니다.
 app.include_router(phone.router)
 
-# [SEO] Robots.txt
+
+# ==========================================================
+# [SEO] 검색엔진 최적화 및 소유권 확인
+# ==========================================================
+
+# 구글 소유권 확인
+@app.get("/google30ad8eaea48a0cb8.html", include_in_schema=False)
+async def google_verification():
+    return Response(content="google-site-verification: google30ad8eaea48a0cb8", media_type="text/html")
+
+# Robots.txt
 @app.get("/robots.txt", include_in_schema=False)
 async def robots_txt():
-    # 실제 도메인으로 변경하세요
     content = """User-agent: *
 Allow: /
 Sitemap: https://super-calc.onrender.com/sitemap.xml
 """
     return Response(content=content, media_type="text/plain")
 
-# [SEO] Sitemap.xml (구조가 단순해짐)
+# Sitemap.xml
 @app.get("/sitemap.xml", include_in_schema=False)
 async def sitemap_xml():
+    # 실제 도메인 주소로 설정
     base_url = "https://super-calc.onrender.com"
     content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
