@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
-from routers import phone
+from routers import phone, board
 
 app = FastAPI()
 
@@ -9,6 +9,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 2. 라우터 등록 (phone.py 하나로 통합)
 app.include_router(phone.router)
+app.include_router(board.router)
 
 # ==========================================================
 # [모니터링] 서버 절전 방지용 (UptimeRobot, cron-job)

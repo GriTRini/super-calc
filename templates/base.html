@@ -13,8 +13,78 @@
     
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        /* 부드러운 스크롤 */
+        /* 1. 기본 레이아웃 */
         html { scroll-behavior: smooth; }
+        body { margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; background-color: #f8f9fa; }
+        
+        .container {
+            max-width: 1400px; /* 양쪽 사이드바를 위해 폭을 넓힘 */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 2. 헤더 스타일 */
+        header { text-align: center; margin-bottom: 20px; }
+        nav { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+        nav a { text-decoration: none; color: #333; font-weight: bold; font-size: 1.1rem; }
+        nav a:hover { color: #007bff; }
+
+        /* 3. 메인 레이아웃 (좌측 + 본문 + 우측) */
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        /* 4. 사이드바 (공통) */
+        .sidebar {
+            width: 160px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+        }
+
+        /* 5. PC 상단 가로 배너 */
+        .pc-top-banner {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 6. 모바일 배너들 (기본 숨김) */
+        .mobile-top-banner { display: none; text-align: center; margin-bottom: 20px; }
+        .mobile-bottom-banner { display: none; text-align: center; margin-top: 40px; margin-bottom: 20px; }
+
+        /* 7. 우측 본문 영역 */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+            max-width: 800px;
+        }
+
+        /* 8. 반응형 처리 */
+        @media (max-width: 1200px) {
+            /* 화면이 조금 좁아지면 우측 광고 숨김 */
+            .right-sidebar { display: none; }
+        }
+
+        @media (max-width: 1000px) {
+            /* 모바일 환경 */
+            .left-sidebar, .right-sidebar, .pc-top-banner {
+                display: none; /* PC 광고 모두 숨김 */
+            }
+            .mobile-top-banner, .mobile-bottom-banner {
+                display: block; /* 모바일 광고 보임 */
+            }
+            .main-wrapper {
+                display: block;
+            }
+            .content-area {
+                max-width: 100%;
+            }
+        }
+
+        footer { margin-top: 50px; color: #999; font-size: 0.8rem; text-align: center; padding-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -22,17 +92,62 @@
         <header>
             <h1>📱 폰가이드 <span style="font-size: 0.6em; color: #666; font-weight: normal;">| 가격 비교 전문</span></h1>
             
-            <nav style="justify-content: center; gap: 20px;">
+            <nav>
                 <a href="/">🔄 비교 계산기 홈</a>
+                <a href="/board">📢 홍보 게시판</a>
                 <a href="#contact">📩 문의하기</a>
             </nav>
         </header>
 
-        <main>
-            {% block content %}{% endblock %}
-        </main>
+        <div class="mobile-top-banner">
+            <ins class="kakao_ad_area" style="display:none;"
+                 data-ad-unit = "DAN-682a4eRJMxb5I1kK"
+                 data-ad-width = "320"
+                 data-ad-height = "50"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+        </div>
 
-        <footer style="margin-top: 50px; color: #999; font-size: 0.8rem; text-align: center; padding-bottom: 20px;">
+        <div class="pc-top-banner">
+            <ins class="kakao_ad_area" style="display:none;"
+                 data-ad-unit = "DAN-HMthuBlOyLRqnQPJ"
+                 data-ad-width = "728"
+                 data-ad-height = "90"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+        </div>
+
+        <div class="main-wrapper">
+            
+            <aside class="sidebar left-sidebar">
+                <ins class="kakao_ad_area" style="display:none;"
+                     data-ad-unit = "DAN-QWIhHjX81NBSd9j3"
+                     data-ad-width = "160"
+                     data-ad-height = "600"></ins>
+                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+            </aside>
+
+            <main class="content-area">
+                {% block content %}{% endblock %}
+            </main>
+
+            <aside class="sidebar right-sidebar">
+                <ins class="kakao_ad_area" style="display:none;"
+                     data-ad-unit = "DAN-4w8RFBcfzSMahtB8"
+                     data-ad-width = "160"
+                     data-ad-height = "600"></ins>
+                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+            </aside>
+            
+        </div>
+
+        <div class="mobile-bottom-banner">
+            <ins class="kakao_ad_area" style="display:none;"
+                 data-ad-unit = "DAN-AGb2Fq6p24gBcgSq"
+                 data-ad-width = "250"
+                 data-ad-height = "250"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+        </div>
+
+        <footer>
             <p>© 2025 Phone Guide Project. All rights reserved.</p>
         </footer>
     </div>

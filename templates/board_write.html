@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    input[type="text"], input[type="number"], input[type="password"], textarea {
+        width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+        box-sizing: border-box; margin-bottom: 15px; font-size: 1rem;
+    }
+    .label { font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
+    .alert-box { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; }
+    .info-box { background: #e3f2fd; color: #0d47a1; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; }
+</style>
+
+<div class="calc-container">
+    <h2 style="text-align: center; margin-bottom: 30px;">✏️ 홍보글 작성하기</h2>
+
+    <div class="section-box">
+        {% if error %}
+        <div class="alert-box">{{ error }}</div>
+        {% endif %}
+
+        <div class="info-box">
+            ℹ️ <strong>안내:</strong> 빠르고 쾌적한 사이트 운영을 위해 <strong>이미지 업로드는 지원하지 않습니다.</strong><br>
+            상세한 가격과 조건을 텍스트로 꼼꼼하게 적어주시면 더 높은 신뢰를 얻을 수 있습니다.
+        </div>
+
+        <form action="/board/write" method="post">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <span class="label">작성자 (매장명)</span>
+                    <input type="text" name="author" required placeholder="예: 서울 구로 성지">
+                </div>
+                <div style="flex: 1;">
+                    <span class="label">비밀번호 (수정/삭제용)</span>
+                    <input type="password" name="password" required placeholder="****">
+                </div>
+            </div>
+
+            <span class="label">제목</span>
+            <input type="text" name="title" required placeholder="제목을 입력하세요 (링크 금지)">
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ddd;">
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #0d47a1;">📱 상세 판매 조건 (필수)</h4>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 200px;">
+                        <span class="label">대상 기종</span>
+                        <input type="text" name="device_name" required placeholder="예: 아이폰 15 Pro">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <span class="label">공시지원금</span>
+                        <input type="number" name="gongsi" placeholder="0" value="0">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <span class="label" style="color:#d32f2f;">매장 추가 지원금</span>
+                        <input type="number" name="store_subsidy" required placeholder="예: 300000" style="border: 2px solid #ffcdd2;">
+                    </div>
+                </div>
+
+                <span class="label">부가서비스/요금제 조건</span>
+                <input type="text" name="addon_detail" required placeholder="예: 99요금제 6개월, 부가2개 (링크 금지)">
+            </div>
+
+            <span class="label">상세 내용 (텍스트 전용)</span>
+            <textarea name="content" rows="10" required placeholder="매장 위치, 상세 조건 등을 적어주세요.&#13;&#10;🚨 주의: 외부 링크(URL) 및 이미지는 등록할 수 없습니다."></textarea>
+
+            <button type="submit" class="btn-yellow" style="width: 100%; font-size: 1.2rem;">등록하기</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

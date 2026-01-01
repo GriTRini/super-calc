@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="calc-container">
+    <div style="margin-bottom: 20px;">
+        <a href="/board" style="text-decoration: none; color: #666;">← 목록으로 돌아가기</a>
+    </div>
+
+    <div class="section-box">
+        <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: #333;">{{ post.title }}</h2>
+            <div style="margin-top: 10px; color: #888; font-size: 0.9rem; display: flex; justify-content: space-between;">
+                <span>작성자: {{ post.author }}</span>
+                <span>{{ post.date }}</span>
+            </div>
+        </div>
+
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 30px; border: 1px solid #90caf9;">
+            <h3 style="margin-top: 0; color: #0d47a1; text-align: center;">📱 판매 조건 요약</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div style="background: white; padding: 10px; border-radius: 8px; text-align: center;">
+                    <span style="display: block; font-size: 0.8rem; color: #666;">대상 기종</span>
+                    <strong style="font-size: 1.1rem;">{{ post.device_name }}</strong>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 8px; text-align: center;">
+                    <span style="display: block; font-size: 0.8rem; color: #666;">공시지원금</span>
+                    <strong>{{ "{:,}".format(post.gongsi) }}원</strong>
+                </div>
+                <div style="background: #fff3e0; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #ffe0b2;">
+                    <span style="display: block; font-size: 0.8rem; color: #d32f2f;">매장 추가 지원금</span>
+                    <strong style="font-size: 1.2rem; color: #d32f2f;">{{ "{:,}".format(post.store_subsidy) }}원</strong>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 8px; text-align: center;">
+                    <span style="display: block; font-size: 0.8rem; color: #666;">부가/요금제</span>
+                    <span style="font-size: 0.9rem;">{{ post.addon_detail }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="line-height: 1.8; min-height: 200px; white-space: pre-wrap;">{{ post.content }}</div>
+    </div>
+</div>
+{% endblock %}
