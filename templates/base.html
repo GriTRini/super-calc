@@ -6,13 +6,16 @@
     
     <title>폰가이드 - 자급제 vs 성지 가격 비교</title>
     <meta name="description" content="핸드폰 싸게 사는 법 종결! 자급제+알뜰폰 조합과 통신사 공시지원금/선택약정 가격을 1초 만에 비교하세요.">
-    <meta name="keywords" content="핸드폰싸게사는법, 자급제비교, 성지시세, 공시지원금, 선택약정, 아이폰17가격, 갤럭시S25가격">
+    <meta name="keywords" content="핸드폰싸게사는법, 자급제비교, 성지시세, 공시지원금, 선택약정">
     
     <meta property="og:title" content="폰가이드 - 핸드폰 최저가 계산기">
     <meta property="og:description" content="자급제가 쌀까? 통신사가 쌀까? 지금 바로 확인해보세요.">
-    <meta property="og:image" content="/static/images/og-image.png">
     
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* 부드러운 스크롤 */
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -21,43 +24,17 @@
             
             <nav style="justify-content: center; gap: 20px;">
                 <a href="/">🔄 비교 계산기 홈</a>
+                <a href="#contact">📩 문의하기</a>
             </nav>
         </header>
-
-        <div class="ad-top-container">
-            <div class="ad-pc-horizontal">
-                <ins class="kakao_ad_area" style="display:none;" 
-                     data-ad-unit="DAN-HMthuBlOyLRqnQPJ" 
-                     data-ad-width="728" 
-                     data-ad-height="90"></ins>
-                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-            </div>
-
-            <div class="ad-mobile-banner">
-                <ins class="kakao_ad_area" style="display:none;" 
-                     data-ad-unit="DAN-682a4eRJMxb5I1kK" 
-                     data-ad-width="320" 
-                     data-ad-height="50"></ins>
-                <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-            </div>
-        </div>
 
         <main>
             {% block content %}{% endblock %}
         </main>
 
-        <footer style="margin-top: 50px; color: #999; font-size: 0.8rem; text-align: center;">
+        <footer style="margin-top: 50px; color: #999; font-size: 0.8rem; text-align: center; padding-bottom: 20px;">
             <p>© 2025 Phone Guide Project. All rights reserved.</p>
         </footer>
     </div>
-
-    <div class="ad-pc-sidebar">
-        <ins class="kakao_ad_area" style="display:none;" 
-             data-ad-unit="DAN-4w8RFBcfzSMahtB8" 
-             data-ad-width="160" 
-             data-ad-height="600"></ins>
-        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-    </div>
-
 </body>
 </html>

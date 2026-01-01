@@ -1,17 +1,17 @@
 from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
-from routers import phone  # routers 폴더의 phone.py 가져오기
+from routers import phone
 
 app = FastAPI()
 
-# 1. 정적 파일 마운트 (CSS, JS, 이미지)
+# 1. 정적 파일 마운트
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# 2. 라우터 등록
+# 2. 라우터 등록 (phone.py 하나로 통합)
 app.include_router(phone.router)
 
 # ==========================================================
-# [모니터링] 서버 절전 방지용 (UptimeRobot 연결)
+# [모니터링] 서버 절전 방지용 (UptimeRobot, cron-job)
 # ==========================================================
 @app.get("/ping")
 async def ping():
